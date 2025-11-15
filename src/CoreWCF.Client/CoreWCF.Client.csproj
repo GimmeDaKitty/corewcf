@@ -11,4 +11,8 @@
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CoreWCF.Contracts\CoreWCF.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

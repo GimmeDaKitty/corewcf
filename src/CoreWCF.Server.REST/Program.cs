@@ -16,7 +16,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/", ([FromServices]ICatInformationService catInformationService) =>
+app.MapGet("/CatInformationService", ([FromServices]ICatInformationService catInformationService) =>
 {
     var photoBytes = catInformationService.GetPhoto();
     return Results.File(photoBytes, "image/jpeg");

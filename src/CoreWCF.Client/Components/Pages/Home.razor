@@ -1,5 +1,6 @@
 ﻿@page "/"
-@inject IHttpClientFactory HttpClientFactory
+@using CoreWCF.Client.Services
+@inject ICatInformationClient RestCatClient
 
 <PageTitle>Cat Pictures Service</PageTitle>
 
@@ -37,18 +38,8 @@
 
         try
         {
-            var httpClient = HttpClientFactory.CreateClient();
-            var response = await httpClient.GetAsync("http://localhost:5002/CatInformationService");
-            
-            if (response.IsSuccessStatusCode)
-            {
-                catImageData = await response.Content.ReadAsByteArrayAsync();
-                hasError = false;
-            }
-            else
-            {
-                hasError = true;
-            }
+            catImageData = await RestCatClient.GetCatPictureAsync();
+            hasError = catImageData == null;
         }
         catch (Exception)
         {
