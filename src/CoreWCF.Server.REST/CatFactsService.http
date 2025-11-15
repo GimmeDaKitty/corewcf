@@ -1,0 +1,13 @@
+@CoreWCF.REST_HostAddress = http://localhost:5252
+###
+# GetCatFacts
+POST {{CoreWCF.REST_HostAddress}}/CatFactsService
+Content-Type: text/xml
+SoapAction: http://tempuri.org/ICatInformationService/GetCatFacts
+
+<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+    <Header/>
+    <Body>
+        <GetCatFacts xmlns="http://tempuri.org/"/>
+    </Body>
+</Envelope>
