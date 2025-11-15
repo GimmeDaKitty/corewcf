@@ -1,0 +1,6 @@
+@CoreWCF.REST_HostAddress = http://localhost:5252
+
+GET {{CoreWCF.REST_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
