@@ -2,5 +2,6 @@
 
 public enum ClientType
 {
-    
+    CoreWCF,
+    REST
 }

@@ -1,5 +1,7 @@
+using System.ServiceModel;
 using CoreWCF.Client;
 using CoreWCF.Client.Components;
+using CoreWCF.Client.REST;
 using CoreWCF.Client.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,18 +10,33 @@ builder.Services
     .AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddHttpClient(ClientConstants.CatInformationClientName, client =>
-{
-    var remoteServiceUrl = builder
-        .Configuration
-        .GetValue<string>("CatInformationService:Url") 
-                           ?? throw new InvalidOperationException("Missing URL endpoint for Cat Information Service");
-    client.BaseAddress = new Uri(remoteServiceUrl);
-});
+var remoteServiceUrl = builder
+                           .Configuration
+                           .GetValue<string>("CatInformationService:Url") 
+                       ?? throw new InvalidOperationException("Missing URL endpoint for Cat Information Service");
 
-// TODO - BEA - DEMO - DEMONSTRATE ONE AND THE OTHER. IS MAKING ANOTHER CLIENT PROJECT OVERKILL?
-//builder.Services.AddScoped<ICatInformationClient, RESTCatInformationClient>();
-builder.Services.AddScoped<ICatInformationClient, CoreWcfCatInformationClient>();
+var clientType = builder
+    .Configuration
+    .GetValue<ClientType>("Client:ClientType");
+
+if (clientType == ClientType.REST)
+{
+    builder.Services.AddHttpClient(ClientConstants.CatInformationClientName, client =>
+    {
+        client.BaseAddress = new Uri(remoteServiceUrl);
+    });
+    
+    builder.Services.AddScoped<ICatPhotoProvider, RestCatPhotoProvider>();
+}
+else
+{
+    builder.Services.AddTransient<CatInformationServiceClient>(_ => new CatInformationServiceClient(
+        CatInformationServiceClient.EndpointConfiguration.BasicHttpBinding_ICatInformationService, 
+        new EndpointAddress(remoteServiceUrl)));
+    
+    builder.Services.AddScoped<ICatPhotoProvider, CoreWcfCatPhotoProvider>(); 
+}
+
 
 var app = builder.Build();
 
@@ -29,7 +46,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 

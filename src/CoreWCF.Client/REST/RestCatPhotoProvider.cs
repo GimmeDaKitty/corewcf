@@ -1,7 +1,7 @@
-﻿using CoreWCF.Client.REST;
+﻿using CoreWCF.Client.Services;
 using CoreWCF.Contracts;
 
-namespace CoreWCF.Client.Services;
+namespace CoreWCF.Client.REST;
 
 public class RestCatPhotoProvider(IHttpClientFactory httpClientFactory) : ICatPhotoProvider
 {
@@ -23,8 +23,7 @@ public class RestCatPhotoProvider(IHttpClientFactory httpClientFactory) : ICatPh
             
             if (response.IsSuccessStatusCode)
             {
-                var serializer = new System.Xml.Serialization.XmlSerializer(typeof(byte[]));
-                return (byte[])serializer.Deserialize(await response.Content.ReadAsStreamAsync()) ?? [];
+                return await SoapResponseBuilder.GetResponseAsync<byte[]>("GetPhotoResult", response);
             }
             
             return null;
@@ -52,8 +51,8 @@ public class RestCatPhotoProvider(IHttpClientFactory httpClientFactory) : ICatPh
             
             if (response.IsSuccessStatusCode)
             {
-                var serializer = new System.Xml.Serialization.XmlSerializer(typeof(CatType[]));
-                return (CatType[])serializer.Deserialize(await response.Content.ReadAsStreamAsync()) ?? [];
+                var soapresponse = await SoapResponseBuilder.GetResponseAsync<GetCatTypesResponse>("GetCatTypesResponse", response);
+                return soapresponse.CatTypes;
             }
             
             return null;

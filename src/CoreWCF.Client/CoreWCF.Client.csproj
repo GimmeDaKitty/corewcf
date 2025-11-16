@@ -8,11 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\images\" />
-  </ItemGroup>
-
+      <PackageReference Include="System.ServiceModel.Primitives" Version="8.0.0" />
+      <PackageReference Include="System.ServiceModel.Http" Version="8.0.0" />
+  </ItemGroup>  
+    
   <ItemGroup>
-    <ProjectReference Include="..\CoreWCF.Contracts\CoreWCF.Contracts.csproj" />
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
 </Project>

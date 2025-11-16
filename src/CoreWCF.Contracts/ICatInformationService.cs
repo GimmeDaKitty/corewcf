@@ -8,6 +8,7 @@ namespace CoreWCF.Contracts
         byte[] GetPhoto();
 
         [OperationContract]
-        CatType[] GetCatTypes(CatType cat);
+        [CoreWCF.FaultContract(typeof(CatLoverFault))]
+        GetCatTypesResponse GetCatTypes(GetCatTypesRequest request);
     }
 }

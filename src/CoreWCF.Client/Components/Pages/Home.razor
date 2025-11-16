@@ -1,6 +1,6 @@
 ﻿@page "/"
 @using CoreWCF.Client.Services
-@inject ICatInformationClient RestCatClient
+@inject ICatPhotoProvider CatPhotoProvider
 
 <PageTitle>Cat Pictures Service</PageTitle>
 
@@ -9,52 +9,52 @@
 <button class="btn btn-primary" @onclick="GetCatPicture">Get Cat Picture</button>
 
 <div class="mt-3">
-    @if (isLoading)
+    @if (_isLoading)
     {
         <p>Loading...</p>
     }
-    else if (catImageData != null)
+    else if (_catImageData != null)
     {
         <p>Here is your kitty!</p>
         <img src="@GetImageSource()" alt="Cat" style="max-width: 500px;" />
     }
-    else if (hasError)
+    else if (_hasError)
     {
-        <p>Uh oh kitty fled away...</p>
+        <p class="text-danger">Unfortunately you are not worthy of the Kitty gods...</p>
         <img src="/images/error.jpg" alt="Placeholder cat" style="max-width: 500px;" />
     }
 </div>
 
 @code {
-    private byte[]? catImageData;
-    private bool isLoading = false;
-    private bool hasError = false;
+    private byte[]? _catImageData;
+    private bool _isLoading;
+    private bool _hasError;
 
     private async Task GetCatPicture()
     {
-        isLoading = true;
-        hasError = false;
-        catImageData = null;
+        _isLoading = true;
+        _hasError = false;
+        _catImageData = null;
 
         try
         {
-            catImageData = await RestCatClient.GetCatPictureAsync();
-            hasError = catImageData == null;
+            _catImageData = await CatPhotoProvider.GetCatPictureAsync();
+            _hasError = _catImageData == null;
         }
         catch (Exception)
         {
-            hasError = true;
+            _hasError = true;
         }
         finally
         {
-            isLoading = false;
+            _isLoading = false;
         }
     }
 
     private string GetImageSource()
     {
-        if (catImageData == null) return string.Empty;
-        var base64 = Convert.ToBase64String(catImageData);
+        if (_catImageData == null) return string.Empty;
+        var base64 = Convert.ToBase64String(_catImageData);
         return $"data:image/jpeg;base64,{base64}";
     }
 }
