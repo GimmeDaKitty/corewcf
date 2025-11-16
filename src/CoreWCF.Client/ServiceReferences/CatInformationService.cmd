@@ -1,0 +1,1 @@
+dotnet-svcutil https://localhost:5002/CatInformationService?wsdl --outputDir "CatInformationService" --outputFile "CatInformationService.cs" --noTypeReuse

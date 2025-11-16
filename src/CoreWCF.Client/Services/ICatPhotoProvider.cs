@@ -1,6 +1,6 @@
 namespace CoreWCF.Client.Services;
 
-internal interface ICatInformationClient
+internal interface ICatInformationService
 {
     Task<byte[]?> GetCatPictureAsync();
 }

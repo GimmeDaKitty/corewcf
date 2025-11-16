@@ -1,6 +1,6 @@
 ﻿namespace CoreWCF.Client.Services;
 
-public class RESTCatInformationClient(IHttpClientFactory httpClientFactory) : ICatInformationClient
+public class RestCatInformationService(IHttpClientFactory httpClientFactory) : ICatInformationService
 {
     private const string SoapAction = "http://tempuri.org/ICatInformationService/GetPhoto";
     
