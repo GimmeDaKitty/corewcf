@@ -7,14 +7,14 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace System.ServiceModel.Contracts
+namespace CoreWCF.Contracts
 {
     using System.Runtime.Serialization;
     
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="CatType", Namespace="http://schemas.datacontract.org/2004/07/System.ServiceModel.Contracts")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CatType", Namespace="http://schemas.datacontract.org/2004/07/CoreWCF.Contracts")]
     public partial class CatType : object
     {
         
@@ -48,6 +48,58 @@ namespace System.ServiceModel.Contracts
             }
         }
     }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CatLoverFault", Namespace="http://schemas.datacontract.org/2004/07/CoreWCF.Contracts")]
+    public partial class CatLoverFault : object
+    {
+        
+        private string ErrorCodeField;
+        
+        private string ErrorMessageField;
+        
+        private System.DateTime ErrorTimestampField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string ErrorCode
+        {
+            get
+            {
+                return this.ErrorCodeField;
+            }
+            set
+            {
+                this.ErrorCodeField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string ErrorMessage
+        {
+            get
+            {
+                return this.ErrorMessageField;
+            }
+            set
+            {
+                this.ErrorMessageField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.DateTime ErrorTimestamp
+        {
+            get
+            {
+                return this.ErrorTimestampField;
+            }
+            set
+            {
+                this.ErrorTimestampField = value;
+            }
+        }
+    }
 }
 
 
@@ -60,7 +112,68 @@ public interface ICatInformationService
     System.Threading.Tasks.Task<byte[]> GetPhotoAsync();
     
     [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICatInformationService/GetCatTypes", ReplyAction="http://tempuri.org/ICatInformationService/GetCatTypesResponse")]
-    System.Threading.Tasks.Task<System.ServiceModel.Contracts.CatType[]> GetCatTypesAsync(System.ServiceModel.Contracts.CatType cat);
+    [System.ServiceModel.FaultContractAttribute(typeof(CoreWCF.Contracts.CatLoverFault), Action="http://tempuri.org/ICatInformationService/GetCatTypesCatLoverFaultFault", Name="CatLoverFault", Namespace="http://schemas.datacontract.org/2004/07/CoreWCF.Contracts")]
+    System.Threading.Tasks.Task<GetCatTypesResponse> GetCatTypesAsync(GetCatTypesRequest request);
+}
+
+[System.Diagnostics.DebuggerStepThroughAttribute()]
+[System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+[System.ServiceModel.MessageContractAttribute(WrapperName="GetCatTypesRequest", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+public partial class GetCatTypesRequest
+{
+    
+    [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
+    public string CatLoverHeader;
+    
+    [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
+    public bool LikesChildren;
+    
+    [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=1)]
+    public string RequestId;
+    
+    [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=2)]
+    public System.DateTime RequestTimestamp;
+    
+    public GetCatTypesRequest()
+    {
+    }
+    
+    public GetCatTypesRequest(string CatLoverHeader, bool LikesChildren, string RequestId, System.DateTime RequestTimestamp)
+    {
+        this.CatLoverHeader = CatLoverHeader;
+        this.LikesChildren = LikesChildren;
+        this.RequestId = RequestId;
+        this.RequestTimestamp = RequestTimestamp;
+    }
+}
+
+[System.Diagnostics.DebuggerStepThroughAttribute()]
+[System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+[System.ServiceModel.MessageContractAttribute(WrapperName="GetCatTypesResponse", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+public partial class GetCatTypesResponse
+{
+    
+    [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
+    public string ResponseId;
+    
+    [System.ServiceModel.MessageHeaderAttribute(Namespace="http://tempuri.org/")]
+    public int TotalCount;
+    
+    [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
+    public CoreWCF.Contracts.CatType[] CatTypes;
+    
+    public GetCatTypesResponse()
+    {
+    }
+    
+    public GetCatTypesResponse(string ResponseId, int TotalCount, CoreWCF.Contracts.CatType[] CatTypes)
+    {
+        this.ResponseId = ResponseId;
+        this.TotalCount = TotalCount;
+        this.CatTypes = CatTypes;
+    }
 }
 
 [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
@@ -118,9 +231,20 @@ public partial class CatInformationServiceClient : System.ServiceModel.ClientBas
         return base.Channel.GetPhotoAsync();
     }
     
-    public System.Threading.Tasks.Task<System.ServiceModel.Contracts.CatType[]> GetCatTypesAsync(System.ServiceModel.Contracts.CatType cat)
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    System.Threading.Tasks.Task<GetCatTypesResponse> ICatInformationService.GetCatTypesAsync(GetCatTypesRequest request)
     {
-        return base.Channel.GetCatTypesAsync(cat);
+        return base.Channel.GetCatTypesAsync(request);
+    }
+    
+    public System.Threading.Tasks.Task<GetCatTypesResponse> GetCatTypesAsync(string CatLoverHeader, bool LikesChildren, string RequestId, System.DateTime RequestTimestamp)
+    {
+        GetCatTypesRequest inValue = new GetCatTypesRequest();
+        inValue.CatLoverHeader = CatLoverHeader;
+        inValue.LikesChildren = LikesChildren;
+        inValue.RequestId = RequestId;
+        inValue.RequestTimestamp = RequestTimestamp;
+        return ((ICatInformationService)(this)).GetCatTypesAsync(inValue);
     }
     
     public virtual System.Threading.Tasks.Task OpenAsync()
