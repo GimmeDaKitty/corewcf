@@ -16,7 +16,7 @@ public static class SoapRequestOperationExtractor
             return "GetPhoto";
         }
 
-        if (xmlDoc.SelectSingleNode("//tem:GetCatTypes", ns) != null)
+        if (xmlDoc.SelectSingleNode("//tem:GetCatTypesRequest", ns) != null)
         {
             return "GetCatTypes";
         }

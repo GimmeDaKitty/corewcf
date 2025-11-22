@@ -12,7 +12,7 @@ public static class SoapResponseBuilder
         xmlDoc.LoadXml(responseXml);
 
         var ns = new XmlNamespaceManager(xmlDoc.NameTable);
-        ns.AddNamespace("s", "http://schemas.xmlsoap.org/soap/envelope/");
+        ns.AddNamespace("soap", "http://schemas.xmlsoap.org/soap/envelope/");
         ns.AddNamespace("tem", "http://tempuri.org/");
 
         var node = xmlDoc.SelectSingleNode($"//tem:{nodeName}", ns);

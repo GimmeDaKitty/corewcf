@@ -2,15 +2,8 @@
 
 namespace CoreWCF.Server.Common.Services;
 
-public sealed class CatInformationService : ICatInformationService
+public sealed class CatInformationService(IHttpClientFactory httpClientFactory) : ICatInformationService
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-    
-    public CatInformationService(IHttpClientFactory httpClientFactory)
-    {
-        _httpClientFactory = httpClientFactory;
-    }
-    
     private readonly List<CatType> _catRaces = new()
     {
         new CatType { RaceName = "Siamese", LikesChildren = true },
@@ -27,7 +20,7 @@ public sealed class CatInformationService : ICatInformationService
 
     public byte[] GetPhoto()
     {
-        var httpClient = _httpClientFactory.CreateClient();
+        var httpClient = httpClientFactory.CreateClient();
         var response = httpClient.GetAsync("https://cataas.com/cat").Result;
         response.EnsureSuccessStatusCode();
         return response.Content.ReadAsByteArrayAsync().Result;
@@ -45,9 +38,6 @@ public sealed class CatInformationService : ICatInformationService
             };
             throw new FaultException<CatLoverFault>(fault, new FaultReason(fault.ErrorMessage));
         }
-        
-        // TODO - BEA - IMPLEMENT LOGGING
-        Console.WriteLine($"The client loves cats! Header says: {request.CatLoverHeader}");
         
         var result = request.LikesChildren
             ? _catRaces

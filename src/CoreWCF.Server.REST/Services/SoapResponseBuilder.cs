@@ -12,7 +12,7 @@ public static class SoapResponseBuilder
     private const string TEMPURINS = @"http://tempuri.org/";
     private const string CORENS = @"http://schemas.datacontract.org/2004/07/CoreWCF.Contracts";
     
-    public static string GetSOAPResponseAsync<TResponse>(TResponse response)
+    public static string GetSOAPResponse<TResponse>(TResponse response)
     {
         using var stream = new MemoryStream();
         
