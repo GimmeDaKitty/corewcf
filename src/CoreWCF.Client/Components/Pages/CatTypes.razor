@@ -3,7 +3,7 @@
 @using System.ServiceModel
 @using CoreWCF.Client.Services
 @using CoreWCF.Contracts
-@inject ICatPhotoProvider CatPhotoProvider
+@inject ICatInformationProvider CatInformationProvider
 
 <PageTitle>Cat Types</PageTitle>
 
@@ -78,7 +78,7 @@
         
         try
         {
-            _catTypes  = await CatPhotoProvider.GetCatTypes(_isCatLover, _likeChildren);
+            _catTypes  = await CatInformationProvider.GetCatTypes(_isCatLover, _likeChildren);
         }
         catch (FaultException faultEx)
         {

@@ -22,12 +22,13 @@ public class CatLoverHeaderInspector(ILogger<CatLoverHeaderInspector> logger) : 
 
     private void LogHeader(Message request)
     {
-        var headerIndex = request.Headers.FindHeader("CatLoverHeader", null);
-
-        if (headerIndex >= 0)
+        var header = request.Headers
+            .FirstOrDefault(h => h.Name == "CatLoverHeader");
+        
+        if (header != null)
         {
-            var header = request.Headers.GetHeader<string>(headerIndex);
-            logger.LogInformation("CatLoverHeader found in GetCatTypes request: {HeaderValue}", header);
+            var headerValue = request.Headers.GetHeader<string>(header.Name, header.Namespace);
+            logger.LogInformation("CatLoverHeader found in GetCatTypes request: {HeaderValue}", headerValue);
         }
         else
         {

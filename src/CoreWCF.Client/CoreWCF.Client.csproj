@@ -14,6 +14,10 @@
     
   <ItemGroup>
     <Folder Include="wwwroot\images\" />
+  </ItemGroup>  
+    
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="ServiceReferences\CatInformationService\dotnet-svcutil.params.json" />
   </ItemGroup>
 
 </Project>

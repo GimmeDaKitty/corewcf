@@ -26,7 +26,14 @@ if (clientType == ClientType.REST)
         client.BaseAddress = new Uri(remoteServiceUrl);
     });
     
-    builder.Services.AddScoped<ICatPhotoProvider, RestCatPhotoProvider>();
+    // THE HARD WAY
+    //builder.Services.AddScoped<ICatInformationProvider, RestCatInformationProvider>();
+    
+    // THE EASY WAY
+    builder.Services.AddTransient<CatInformationServiceClient>(_ => new CatInformationServiceClient(
+        CatInformationServiceClient.EndpointConfiguration.BasicHttpBinding_ICatInformationService, 
+        new EndpointAddress(remoteServiceUrl))); 
+    builder.Services.AddScoped<ICatInformationProvider, RestCatInformationProviderEasyWay>();
 }
 else
 {
@@ -34,7 +41,7 @@ else
         CatInformationServiceClient.EndpointConfiguration.BasicHttpBinding_ICatInformationService, 
         new EndpointAddress(remoteServiceUrl)));
     
-    builder.Services.AddScoped<ICatPhotoProvider, CoreWcfCatPhotoProvider>(); 
+    builder.Services.AddScoped<ICatInformationProvider, CoreWcfCatInformationProvider>(); 
 }
 
 builder.Logging.ClearProviders();

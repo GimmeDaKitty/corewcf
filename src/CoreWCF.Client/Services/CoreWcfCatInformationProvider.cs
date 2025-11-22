@@ -2,7 +2,7 @@
 
 namespace CoreWCF.Client.Services;
 
-public sealed class CoreWcfCatPhotoProvider(CatInformationServiceClient client) : ICatPhotoProvider
+public sealed class CoreWcfCatInformationProvider(CatInformationServiceClient client) : ICatInformationProvider
 {
     public async Task<byte[]?> GetCatPictureAsync()
     {

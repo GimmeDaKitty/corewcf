@@ -10,6 +10,7 @@ builder.Services.AddTransient<ICatInformationService, CatInformationService>();
 builder.Services.AddSingleton<IServiceBehavior, UseRequestHeadersForMetadataAddressBehavior>();
 builder.Services.AddSingleton<CatLoverHeaderBehavior>();
 builder.Services.AddHttpClient();
+builder.Services.AddTransient<CatInformationService>(); // If not added, you need an empty constructor on the service class
 //builder.Services.AddSingleton<IServiceBehavior, FaultContractAttribute>();
 
 builder.Logging.ClearProviders();

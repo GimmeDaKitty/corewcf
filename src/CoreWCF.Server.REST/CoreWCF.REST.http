@@ -4,3 +4,40 @@ GET {{CoreWCF.REST_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+# Controller endpoint - GetCatTypes
+POST {{CoreWCF.REST_HostAddress}}/CatInformation/GetCatTypes
+Content-Type: text/xml
+
+<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+    <Header>
+        <AuthToken xmlns="http://tempuri.org/">SecretCatToken123</AuthToken>
+    </Header>
+    <Body>
+        <Request xmlns="http://tempuri.org/">
+            <LikesChildren>true</LikesChildren>
+            <CatLoverHeader>I am a true cat lover</CatLoverHeader>
+        </Request>
+    </Body>
+</Envelope>
+
+###
+
+# Minimal API endpoint - GetCatTypes (for comparison)
+POST {{CoreWCF.REST_HostAddress}}/CatInformationService/GetCatTypes
+Content-Type: text/xml
+
+<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+    <Header>
+        <AuthToken xmlns="http://tempuri.org/">SecretCatToken123</AuthToken>
+    </Header>
+    <Body>
+        <Request xmlns="http://tempuri.org/">
+            <LikesChildren>true</LikesChildren>
+            <CatLoverHeader>I am a true cat lover</CatLoverHeader>
+        </Request>
+    </Body>
+</Envelope>
+
+###
+

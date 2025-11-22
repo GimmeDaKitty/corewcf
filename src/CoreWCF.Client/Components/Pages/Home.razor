@@ -1,6 +1,6 @@
 ﻿@page "/"
 @using CoreWCF.Client.Services
-@inject ICatPhotoProvider CatPhotoProvider
+@inject ICatInformationProvider CatInformationProvider
 
 <PageTitle>Cat Pictures Service</PageTitle>
 
@@ -38,7 +38,7 @@
 
         try
         {
-            _catImageData = await CatPhotoProvider.GetCatPictureAsync();
+            _catImageData = await CatInformationProvider.GetCatPictureAsync();
             _hasError = _catImageData == null;
         }
         catch (Exception)

@@ -1,7 +1,19 @@
-﻿namespace CoreWCF.Server.REST.Services;
+﻿using System.Text;
+
+namespace CoreWCF.Server.REST.Services;
 
 public static class SoapRequestOperationExtractor
 {
+    public static async Task<string> GetSoapOperation(HttpContext httpContext)
+    {
+        httpContext.Request.EnableBuffering();
+        using var reader = new StreamReader(httpContext.Request.Body, Encoding.UTF8, leaveOpen: true);
+        var soapRequest = await reader.ReadToEndAsync();
+        httpContext.Request.Body.Position = 0;
+        
+        return GetSoapOperation(soapRequest);
+    }
+    
     public static string GetSoapOperation(string soapRequest)
     {
         var xmlDoc = new System.Xml.XmlDocument();

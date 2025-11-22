@@ -3,7 +3,7 @@ using CoreWCF.Contracts;
 
 namespace CoreWCF.Client.REST;
 
-public class RestCatPhotoProvider(IHttpClientFactory httpClientFactory) : ICatPhotoProvider
+public class RestCatInformationProvider(IHttpClientFactory httpClientFactory) : ICatInformationProvider
 {
     private const string GetPhotoSoapAction = "http://tempuri.org/ICatInformationService/GetPhoto";
     private const string GetCatTypesSoapAction = "http://tempuri.org/ICatInformationService/GetCatTypes";
