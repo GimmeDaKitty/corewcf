@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Xml;
 
-namespace CoreWCF.Client.REST;
+namespace CoreWCF.Client.Services;
 
 public static class SoapRequestBuilder
 {

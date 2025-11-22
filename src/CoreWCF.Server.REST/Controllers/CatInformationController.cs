@@ -35,9 +35,6 @@ public class CatInformationController(
             }
         };
         
-        // TODO - BEA - REVISIT. I have generated the contract from ?wsdl.
-        // WITH THE BRP WE HAD XML, AND WE GENERATED USING XMLSERIALIZER. IS THERE A DIFFERENCE IN THE WAY OF OBTAINING THE SOURCES? 
-        // Serialize to XML
         var xmlSerializer = new XmlSerializer(typeof(GetCatTypesResponseEnvelope));
         await using var stringWriter = new StringWriter();
         xmlSerializer.Serialize(stringWriter, response);

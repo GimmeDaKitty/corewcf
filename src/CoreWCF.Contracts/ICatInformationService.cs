@@ -1,7 +1,4 @@
-﻿
-using System.Threading.Tasks;
-
-namespace CoreWCF.Contracts
+﻿namespace CoreWCF.Contracts
 {
     [ServiceContract]
     public interface ICatInformationService

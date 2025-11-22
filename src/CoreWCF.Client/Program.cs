@@ -1,7 +1,6 @@
 using System.ServiceModel;
 using CoreWCF.Client;
 using CoreWCF.Client.Components;
-using CoreWCF.Client.REST;
 using CoreWCF.Client.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,23 +16,16 @@ var remoteServiceUrl = builder
 
 var clientType = builder
     .Configuration
-    .GetValue<ClientType>("Client:ClientType");
+    .GetValue<DifficultyLevel>("Client:DifficultyLevel");
 
-if (clientType == ClientType.REST)
+if (clientType == DifficultyLevel.Hard)
 {
     builder.Services.AddHttpClient(ClientConstants.CatInformationClientName, client =>
     {
         client.BaseAddress = new Uri(remoteServiceUrl);
     });
     
-    // THE HARD WAY
-    //builder.Services.AddScoped<ICatInformationProvider, RestCatInformationProvider>();
-    
-    // THE EASY WAY
-    builder.Services.AddTransient<CatInformationServiceClient>(_ => new CatInformationServiceClient(
-        CatInformationServiceClient.EndpointConfiguration.BasicHttpBinding_ICatInformationService, 
-        new EndpointAddress(remoteServiceUrl))); 
-    builder.Services.AddScoped<ICatInformationProvider, RestCatInformationProviderEasyWay>();
+    builder.Services.AddScoped<ICatInformationProvider, RestCatInformationProviderHard>();
 }
 else
 {
@@ -41,7 +33,7 @@ else
         CatInformationServiceClient.EndpointConfiguration.BasicHttpBinding_ICatInformationService, 
         new EndpointAddress(remoteServiceUrl)));
     
-    builder.Services.AddScoped<ICatInformationProvider, CoreWcfCatInformationProvider>(); 
+    builder.Services.AddScoped<ICatInformationProvider, RestCatInformationProviderEasy>(); 
 }
 
 builder.Logging.ClearProviders();

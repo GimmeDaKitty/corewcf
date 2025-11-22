@@ -109,7 +109,7 @@ public interface ICatInformationService
 {
     
     [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICatInformationService/GetPhoto", ReplyAction="http://tempuri.org/ICatInformationService/GetPhotoResponse")]
-    System.Threading.Tasks.Task<byte[]> GetPhotoAsync();
+    System.Threading.Tasks.Task<GetPhotoResponse> GetPhotoAsync(GetPhotoRequest request);
     
     [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICatInformationService/GetCatTypes", ReplyAction="http://tempuri.org/ICatInformationService/GetCatTypesResponse")]
     [System.ServiceModel.FaultContractAttribute(typeof(CoreWCF.Contracts.CatLoverFault), Action="http://tempuri.org/ICatInformationService/GetCatTypesCatLoverFaultFault", Name="CatLoverFault", Namespace="http://schemas.datacontract.org/2004/07/CoreWCF.Contracts")]
@@ -118,7 +118,36 @@ public interface ICatInformationService
 
 [System.Diagnostics.DebuggerStepThroughAttribute()]
 [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+[System.ServiceModel.MessageContractAttribute(WrapperName="GetPhoto", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+public partial class GetPhotoRequest
+{
+    
+    public GetPhotoRequest()
+    {
+    }
+}
+
+[System.Diagnostics.DebuggerStepThroughAttribute()]
+[System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+[System.ServiceModel.MessageContractAttribute(WrapperName="GetPhotoResponse", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+public partial class GetPhotoResponse
+{
+    
+    [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
+    public byte[] GetPhotoResult;
+    
+    public GetPhotoResponse()
+    {
+    }
+    
+    public GetPhotoResponse(byte[] GetPhotoResult)
+    {
+        this.GetPhotoResult = GetPhotoResult;
+    }
+}
+
+[System.Diagnostics.DebuggerStepThroughAttribute()]
+[System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
 [System.ServiceModel.MessageContractAttribute(WrapperName="GetCatTypesRequest", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
 public partial class GetCatTypesRequest
 {
@@ -150,7 +179,6 @@ public partial class GetCatTypesRequest
 
 [System.Diagnostics.DebuggerStepThroughAttribute()]
 [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-[System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
 [System.ServiceModel.MessageContractAttribute(WrapperName="GetCatTypesResponse", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
 public partial class GetCatTypesResponse
 {
@@ -226,25 +254,14 @@ public partial class CatInformationServiceClient : System.ServiceModel.ClientBas
     {
     }
     
-    public System.Threading.Tasks.Task<byte[]> GetPhotoAsync()
+    public System.Threading.Tasks.Task<GetPhotoResponse> GetPhotoAsync(GetPhotoRequest request)
     {
-        return base.Channel.GetPhotoAsync();
+        return base.Channel.GetPhotoAsync(request);
     }
     
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    System.Threading.Tasks.Task<GetCatTypesResponse> ICatInformationService.GetCatTypesAsync(GetCatTypesRequest request)
+    public System.Threading.Tasks.Task<GetCatTypesResponse> GetCatTypesAsync(GetCatTypesRequest request)
     {
         return base.Channel.GetCatTypesAsync(request);
-    }
-    
-    public System.Threading.Tasks.Task<GetCatTypesResponse> GetCatTypesAsync(string CatLoverHeader, bool LikesChildren, string RequestId, System.DateTime RequestTimestamp)
-    {
-        GetCatTypesRequest inValue = new GetCatTypesRequest();
-        inValue.CatLoverHeader = CatLoverHeader;
-        inValue.LikesChildren = LikesChildren;
-        inValue.RequestId = RequestId;
-        inValue.RequestTimestamp = RequestTimestamp;
-        return ((ICatInformationService)(this)).GetCatTypesAsync(inValue);
     }
     
     public virtual System.Threading.Tasks.Task OpenAsync()

@@ -1,8 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using System.Xml;
-using System.Xml.Serialization;
 
-namespace CoreWCF.Client.REST;
+namespace CoreWCF.Client.Services;
 
 public static class SoapResponseBuilder
 {
@@ -32,7 +31,6 @@ public static class SoapResponseBuilder
         return (TResponse)(object)Convert.FromBase64String(node.InnerText);
     }
 
-    // Check if this is a GetCatTypesResponse
     if (typeof(TResponse) == typeof(GetCatTypesResponse))
     {
         var catTypesNode = node.SelectSingleNode("tem:CatTypes", ns);

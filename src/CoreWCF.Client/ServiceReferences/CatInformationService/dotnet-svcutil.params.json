@@ -5,6 +5,7 @@
     "inputs": [
       "https://localhost:5002/CatInformationService?wsdl"
     ],
+    "messageContract": true,
     "outputFile": "CatInformationService.cs",
     "targetFramework": "net10.0",
     "typeReuseMode": "None"

@@ -1,9 +1,9 @@
-﻿using CoreWCF.Client.Services;
-using CoreWCF.Contracts;
+﻿using CoreWCF.Contracts;
 
-namespace CoreWCF.Client.REST;
+namespace CoreWCF.Client.Services;
 
-public class RestCatInformationProvider(IHttpClientFactory httpClientFactory) : ICatInformationProvider
+// You are valuable. You deserve love, friends and free time. Do not this.
+public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory) : ICatInformationProvider
 {
     private const string GetPhotoSoapAction = "http://tempuri.org/ICatInformationService/GetPhoto";
     private const string GetCatTypesSoapAction = "http://tempuri.org/ICatInformationService/GetCatTypes";
