@@ -5,6 +5,6 @@ namespace CoreWCF.Client.Services;
 
 internal interface ICatInformationProvider
 {
-    Task<byte[]?> GetCatPictureAsync();
-    Task<CatType[]> GetCatTypes(bool containsHeader, bool onlyCatsThatLikeChildren);
+    Task<Result<byte[]>> GetCatPictureAsync();
+    Task<Result<CatType[]>> GetCatTypes(bool containsHeader, bool onlyCatsThatLikeChildren);
 }

@@ -36,19 +36,18 @@
         _hasError = false;
         _catImageData = null;
 
-        try
+        var result = await CatInformationProvider.GetCatPictureAsync();
+
+        if (result.IsSuccess)
         {
-            _catImageData = await CatInformationProvider.GetCatPictureAsync();
-            _hasError = _catImageData == null;
+            _catImageData = result.Value;
         }
-        catch (Exception)
+        else
         {
             _hasError = true;
         }
-        finally
-        {
-            _isLoading = false;
-        }
+    
+        _isLoading = false;
     }
 
     private string GetImageSource()

@@ -76,22 +76,18 @@
         _faultMessage = null;
         _catTypes = null;
         
-        try
+        var result  = await CatInformationProvider.GetCatTypes(_isCatLover, _likeChildren);
+        
+        if (result.IsSuccess)
         {
-            _catTypes  = await CatInformationProvider.GetCatTypes(_isCatLover, _likeChildren);
+            _catTypes = result.Value;
         }
-        catch (FaultException faultEx)
+        else
         {
-            _faultMessage = $"SOAP Fault: {faultEx.Message}";
+            _faultMessage = result.Error; 
         }
-        catch (Exception ex)
-        {
-            _faultMessage = $"Unexpected error: {ex.Message}";
-        }
-        finally
-        {
-            _isLoading = false;
-        }
+        
+        _isLoading = false;
     }
 }
 

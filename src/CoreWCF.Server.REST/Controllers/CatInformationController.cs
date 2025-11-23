@@ -3,6 +3,7 @@ using CoreWCF.Server.REST.Filters;
 using CoreWCF.Server.REST.RestWrappers;
 using Microsoft.AspNetCore.Mvc;
 using System.Xml.Serialization;
+using CoreWCF.Server.REST.Services;
 
 namespace CoreWCF.Server.REST.Controllers;
 
@@ -23,10 +24,12 @@ public class CatInformationController(
     public async Task<IActionResult> GetCatTypes(
         [FromBody] GetCatTypesRequestEnvelope envelope)
     {
-        //envelope.Request!.CatLoverHeader = envelope.Header?.CatLoverHeader;
+        // Needs the SWAPPING since the serializer does not understand MessageContracts
         envelope.Body.Request.CatLoverHeader = envelope.Header.CatLoverHeader;
         var serviceResponse = catInformationService.GetCatTypes(envelope.Body.Request);
 
+        // Server serialization flavor 2: use envelopes, which effectively means
+        // you have to reconstruct 100% your data contract to indicate XML namespaces
         var response = new GetCatTypesResponseEnvelope
         {
             Body = new GetCatTypesResponseBody
@@ -35,11 +38,9 @@ public class CatInformationController(
             }
         };
         
-        var xmlSerializer = new XmlSerializer(typeof(GetCatTypesResponseEnvelope));
-        await using var stringWriter = new StringWriter();
-        xmlSerializer.Serialize(stringWriter, response);
-        
-        return Content(stringWriter.ToString(), "text/xml; charset=utf-8");
+        // Using the generic serializer, since the response already contains the SOAP envelope.
+        var xmlString = await GenericSerializer.Serialize(response);
+        return Content(xmlString, "text/xml; charset=utf-8");
     }
 }
 

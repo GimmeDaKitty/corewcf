@@ -8,7 +8,7 @@ public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory
     private const string GetPhotoSoapAction = "http://tempuri.org/ICatInformationService/GetPhoto";
     private const string GetCatTypesSoapAction = "http://tempuri.org/ICatInformationService/GetCatTypes";
     
-    public async Task<byte[]?> GetCatPictureAsync()
+    public async Task<Result<byte[]>> GetCatPictureAsync()
     {
         try
         {
@@ -23,18 +23,19 @@ public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory
             
             if (response.IsSuccessStatusCode)
             {
-                return await SoapResponseBuilder.GetResponseAsync<byte[]>("GetPhotoResult", response);
+                var photoResponse = await SoapResponseBuilder.GetResponseAsync<GetPhotoResponse>("GetPhotoResponse", response);
+                return Result<byte[]>.OkResult(photoResponse.GetPhotoResult);
             }
             
-            return null;
+            return Result<byte[]>.NOkResult($"Remote API returned error: {await response.Content.ReadAsStringAsync()}");
         }
-        catch
+        catch (Exception ex)
         {
-            return null;
+            return Result<byte[]>.NOkResult($"Error while processing request: {ex.Message}");
         }
     }
 
-    public async Task<CatType[]> GetCatTypes(bool containsHeader, bool onlyCatsThatLikeChildren)
+    public async Task<Result<CatType[]>> GetCatTypes(bool containsHeader, bool onlyCatsThatLikeChildren)
     {
         try
         {
@@ -52,14 +53,19 @@ public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory
             if (response.IsSuccessStatusCode)
             {
                 var soapresponse = await SoapResponseBuilder.GetResponseAsync<GetCatTypesResponse>("GetCatTypesResponse", response);
-                return soapresponse.CatTypes;
+                return Result<CatType[]>.OkResult(soapresponse.CatTypes);
             }
             
-            return null;
+            var responseHasContent = response.Content.Headers.ContentLength > 0;
+            var errorMessage = responseHasContent
+                ? await response.Content.ReadAsStringAsync()
+                : $"response code {(int)response.StatusCode} - {response.StatusCode}";
+            
+            return Result<CatType[]>.NOkResult($"Remote API returned error: {errorMessage}");
         }
-        catch
+        catch (Exception ex)
         {
-            return null;
+            return Result<CatType[]>.NOkResult($"Error while processing request: {ex.Message}");
         }
     }
 }

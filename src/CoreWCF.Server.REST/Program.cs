@@ -1,3 +1,4 @@
+using System.Xml.Serialization;
 using CoreWCF.Contracts;
 using CoreWCF.Server.Common.Services;
 using CoreWCF.Server.REST;
@@ -14,9 +15,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddHttpClient();
 builder.Services.AddTransient<ICatInformationService, CatInformationService>();
 
-// Register request filters for use in controllers
+// Controllers
 builder.Services.AddScoped<SoapAuthorizationFilter>();
-
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<SoapAuthorizationFilter>();
@@ -35,8 +35,6 @@ builder.Services.AddControllers(options =>
     xmlOutputFormatter.SupportedMediaTypes.Add("text/xml");
     xmlOutputFormatter.SupportedMediaTypes.Add("application/xml");
     options.OutputFormatters.Add(xmlOutputFormatter);
-    
-    //options.FormatterMappings.SetMediaTypeMappingForFormat("xml", "text/xml");
 });
 
 builder.Logging.ClearProviders();
@@ -49,50 +47,40 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// Middleware
 app.UseMiddleware<SoapHeaderLoggingMiddleware>();
+
+// Routing for SOAP-as-REST
 app.UseMiddleware<SoapRoutingMiddleware>();
 app.UseRouting();
 
 app.UseHttpsRedirection();
 
-// TODO - BEA - RECUPERA
-// LESS BAD - REQUIRES ROUTING
-// app.MapPost("/CatInformationService/GetPhoto", async (
-//     [FromServices] ICatInformationService catInformationService) =>
-// {
-//     var photo = catInformationService.GetPhoto();
-//     var response = new SoapEnvelope<GetPhotoResponse>
-//     {
-//         ResponseBody = new SoapRequestBody<GetPhotoResponse>
-//         {
-//             Res = new GetPhotoResponse
-//             {
-//                 GetPhotoResult = photo
-//             }
-//         }
-//     };
-//
-//     return await ResponseXmlSerializer.Serialize(response);
-// });
+// LESS BAD - REQUIRES ROUTING - WORKS
+app.MapPost("/CatInformationService/GetPhoto", async (
+    [FromServices] ICatInformationService catInformationService) =>
+{
+    var photo = catInformationService.GetPhoto();
+    return SoapResponseEnvelopeBuilder.GetSOAPPhotoResponse(photo);
+});
 
-
-// BETTER BUT DOES NOT WORK - Using SoapEnvelope wrapper for automatic deserialization
+// LESS BAD - REQUIRES ROUTING [DOES NOT WORK]
 // app.MapPost("/CatInformationService/GetCatTypes", async (
-//     [FromBody] SoapEnvelope<GetCatTypesRequestWrapper> envelope,
-//     [FromServices] ICatInformationService catInformationService) =>
+//         [FromBody] GetCatTypesRequestEnvelope envelope, 
+//         [FromServices] ICatInformationService catInformationService) =>
 // {
-//     var response = new SoapEnvelope<GetCatTypesResponseWrapper>
+//     envelope.Body.Request.CatLoverHeader = envelope.Header.CatLoverHeader;
+//     var response = new GetCatTypesResponseEnvelope
 //     {
-//         Body = new SoapBody<GetCatTypesResponse>
+//         Body = new GetCatTypesResponseBody
 //         {
 //             Response = catInformationService.GetCatTypes(envelope.Body.Request)
 //         }
 //     };
 //     
-//     return await ResponseXmlSerializer.Serialize(response);
+//     return await GetCatTypesResponseSerializer.Serialize(response);
 // })
 // .AddEndpointFilter<SoapAuthorizationFilter>();
-
 
 // VERY BAD
 // app.MapPost("/CatInformationService", async (HttpContext httpContext, 
@@ -106,13 +94,8 @@ app.UseHttpsRedirection();
 //         
 //         if (operation == "GetPhoto")
 //         {
-//             var photoResponse = new GetPhotoResponse
-//             {
-//                 GetPhotoResult = catInformationService.GetPhoto()
-//             };
-//             
-//             soapResponse = SoapResponseBuilder.GetSOAPResponse(photoResponse);
-//             
+//             var photo = catInformationService.GetPhoto();
+//             soapResponse = SoapResponseEnvelopeBuilder.GetSOAPPhotoResponse(photo);
 //             return Results.Content(soapResponse, "text/xml");
 //         }
 //         
@@ -130,6 +113,7 @@ app.UseHttpsRedirection();
 //         {
 //             return Results.BadRequest("Invalid SOAP request");
 //         }
+//         
 //         // get header CatLoverHeader under SOAP header
 //         var headerNode = xmlDoc.SelectSingleNode("//soapenv:Header/tem:CatLoverHeader", namespaceManager);
 //         var catLoverHeaderValue = headerNode?.InnerText;
@@ -140,15 +124,29 @@ app.UseHttpsRedirection();
 //             {
 //                 Namespace = "http://tempuri.org/"
 //             });
+//         
 //         using var stringReader = new StringReader(bodyNode.OuterXml);
 //         var getCatTypesRequest = (GetCatTypesRequest)xmlSerializer.Deserialize(stringReader);
 //         getCatTypesRequest.CatLoverHeader = catLoverHeaderValue;
-//         var catTypesResponse = catInformationService.GetCatTypes(getCatTypesRequest);
-//         soapResponse = SoapResponseBuilder.GetSOAPResponse(catTypesResponse);
+//         var serviceResponse = catInformationService.GetCatTypes(getCatTypesRequest);
+//         
+//         var response = new GetCatTypesResponseEnvelope
+//         {
+//             Body = new GetCatTypesResponseBody
+//             {
+//                 Response = serviceResponse
+//             }
+//         };
+//         
+//         // Using the generic serializer, since the response already contains the SOAP envelope.
+//         soapResponse = await GenericSerializer.Serialize(response);
+//         
 //         return Results.Content(soapResponse, "text/xml");
-//
 //     })
 //     .AddEndpointFilter<SoapAuthorizationFilter>() 
 //     .WithName("CatInformationService");
+
+// Controllers
 app.MapControllers();
+
 app.Run();
