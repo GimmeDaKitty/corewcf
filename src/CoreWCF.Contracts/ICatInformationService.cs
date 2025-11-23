@@ -1,4 +1,6 @@
-﻿namespace CoreWCF.Contracts
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace CoreWCF.Contracts
 {
     [ServiceContract]
     public interface ICatInformationService
@@ -9,5 +11,9 @@
         [OperationContract]
         [CoreWCF.FaultContract(typeof(CatLoverFault))]
         GetCatTypesResponse GetCatTypes(GetCatTypesRequest request);
+        
+        [OperationContract]
+        [Authorize(Policy = "IsCoolHuman")]
+        BellyRubResponse AttemptBellyRub();
     }
 }

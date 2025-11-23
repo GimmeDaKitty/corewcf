@@ -22,7 +22,7 @@ public static class SoapRequestBuilder
            </soapenv:Body>
      </soapenv:Envelope>
      */
-    public static string? BuildGetCatPhotoRequest()
+    public static string BuildGetCatPhotoRequest()
     {
         using var stream = new MemoryStream();
 
@@ -53,6 +53,47 @@ public static class SoapRequestBuilder
     }
 
     /// <summary>
+    /// Build AttemptBellyRub request
+    /// </summary>
+    /*
+     <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
+           <soapenv:Header/>
+           <soapenv:Body>
+              <tem:AttemptBellyRub/>
+           </soapenv:Body>
+     </soapenv:Envelope>
+     */
+    public static string BuildAttemptBellyRubRequest()
+    {
+        using var stream = new MemoryStream();
+
+        Encoding utf8 = new UTF8Encoding(false); // omit BOM
+        using (var writer = new XmlTextWriter(stream, utf8))
+        {
+            // <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+            writer.WriteStartDocument();
+            writer.WriteStartElement("soapenv", "Envelope", SOAPNS);
+
+            writer.WriteStartElement("soapenv", "Header", SOAPNS); // SOAP Header
+            writer.WriteEndElement(); // Header
+
+            //<soapenv:Body xmlns:tem="http://tempuri.org/" xmlns:cor="http://schemas.datacontract.org/2004/07/CoreWCF.Contracts">
+            writer.WriteStartElement("soapenv", "Body", SOAPNS);
+            writer.WriteAttributeString("xmlns", TEMPURINGNSPREFIX, null, TEMPURINS);
+            writer.WriteAttributeString("xmlns", CORENSPREFIX, null, CORENS);
+
+            // <tem:AttemptBellyRub/>
+            writer.WriteStartElement(TEMPURINGNSPREFIX, "AttemptBellyRub", TEMPURINS);
+            writer.WriteEndElement();
+
+            writer.WriteEndElement(); // Body
+            writer.WriteEndElement(); // Envelope
+        }
+        
+        return Encoding.UTF8.GetString(stream.ToArray());
+    }
+
+    /// <summary>
     /// Build CatTypes request
     /// </summary>
     /* Example request
@@ -71,7 +112,7 @@ public static class SoapRequestBuilder
            </soapenv:Body>
         </soapenv:Envelope>
     */
-    public static string? BuildGetCatTypesRequest(string? headerContent, bool likesChildren)
+    public static string BuildGetCatTypesRequest(string? headerContent, bool likesChildren)
     {
         using var stream = new MemoryStream();
         

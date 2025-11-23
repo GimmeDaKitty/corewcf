@@ -15,6 +15,7 @@
   <ItemGroup>
     <PackageReference Include="CoreWCF.Primitives" Version="1.*" />
     <PackageReference Include="CoreWCF.Http" Version="1.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CoreWCF.Server.Common\CoreWCF.Server.Common.csproj" />

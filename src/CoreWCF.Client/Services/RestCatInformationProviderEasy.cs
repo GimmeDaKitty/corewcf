@@ -1,4 +1,6 @@
-﻿using CoreWCF.Contracts;
+﻿using System.ServiceModel;
+using System.ServiceModel.Channels;
+using CoreWCF.Contracts;
 
 namespace CoreWCF.Client.Services;
 
@@ -40,6 +42,28 @@ public sealed class RestCatInformationProviderEasy(CatInformationServiceClient c
         catch (Exception ex)
         {
             return Result<CatType[]>.NOkResult($"Error while processing request: {ex.Message}");
+        }
+    }
+
+    public async Task<Result> CanPetTheCatAsync(HumanType humanType)
+    {
+        var token = FakeJwtTokenGenerator.GenerateToken(humanType);
+
+        // TODO - BEA - CAN I DO THIS IN A MORE ELEGANT WAY THROUGH DI?
+        // ESTOY AQUI - RUN WITH CLIENT.EASY AND SERVER.COREWCF.
+        // IF THIS WORKS, IMPLEMENT CLIENT.EASY AND SERVER.REST
+        // TRY CLIENT.HARD AND SERVER.REST AS WELL
+        using (new OperationContextScope(client.InnerChannel))
+        {
+            var httpRequestProperty = new HttpRequestMessageProperty();
+            httpRequestProperty.Headers["Authorization"] = $"Bearer {token}";
+            OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = httpRequestProperty;
+
+            var attemptBellyRub = await client.AttemptBellyRubAsync(new AttemptBellyRubRequest());
+
+            return attemptBellyRub.Allowed
+                ? Result.Ok
+                : Result.NOk("You dont have the rights to pet the cat");
         }
     }
 }

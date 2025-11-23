@@ -52,4 +52,9 @@ public sealed class CatInformationService(IHttpClientFactory httpClientFactory) 
             CatTypes = result
         };
     }
+
+    public BellyRubResponse AttemptBellyRub()
+    {
+        return new BellyRubResponse { Allowed = true };
+    }
 }

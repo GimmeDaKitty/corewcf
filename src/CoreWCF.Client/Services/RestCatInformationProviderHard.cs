@@ -7,6 +7,7 @@ public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory
 {
     private const string GetPhotoSoapAction = "http://tempuri.org/ICatInformationService/GetPhoto";
     private const string GetCatTypesSoapAction = "http://tempuri.org/ICatInformationService/GetCatTypes";
+    private const string AttemptBellyRubSoapAction = "http://tempuri.org/ICatInformationService/AttemptBellyRub";
     
     public async Task<Result<byte[]>> GetCatPictureAsync()
     {
@@ -66,6 +67,43 @@ public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory
         catch (Exception ex)
         {
             return Result<CatType[]>.NOkResult($"Error while processing request: {ex.Message}");
+        }
+    }
+
+    public async Task<Result> CanPetTheCatAsync(HumanType humanType)
+    {
+        try
+        {
+            var token = FakeJwtTokenGenerator.GenerateToken(humanType);
+            
+            var httpClient = httpClientFactory.CreateClient(ClientConstants.CatInformationClientName);
+
+            var soapRequest = SoapRequestBuilder.BuildAttemptBellyRubRequest();
+            
+            var content = new StringContent(soapRequest, System.Text.Encoding.UTF8, "text/xml");
+            content.Headers.Add("SOAPAction", AttemptBellyRubSoapAction);
+            content.Headers.Add("Authorization", $"Bearer {token}");
+            
+            var response = await httpClient.PostAsync("/CatInformationService", content);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var soapresponse = await SoapResponseBuilder.GetResponseAsync<BellyRubResponse>("BellyRubResponse", response);
+                return soapresponse.Allowed
+                    ? Result.Ok
+                    : Result.NOk("You are not allowed to pet the cat.");
+            }
+            
+            var responseHasContent = response.Content.Headers.ContentLength > 0;
+            var errorMessage = responseHasContent
+                ? await response.Content.ReadAsStringAsync()
+                : $"response code {(int)response.StatusCode} - {response.StatusCode}";
+            
+            return Result<bool>.NOkResult($"Remote API returned error: {errorMessage}");
+        }
+        catch (Exception ex)
+        {
+            return Result<bool>.NOkResult($"Error while processing request: {ex.Message}");
         }
     }
 }
