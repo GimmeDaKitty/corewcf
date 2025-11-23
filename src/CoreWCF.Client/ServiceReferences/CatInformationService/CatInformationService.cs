@@ -114,9 +114,6 @@ public interface ICatInformationService
     [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICatInformationService/GetCatTypes", ReplyAction="http://tempuri.org/ICatInformationService/GetCatTypesResponse")]
     [System.ServiceModel.FaultContractAttribute(typeof(CoreWCF.Contracts.CatLoverFault), Action="http://tempuri.org/ICatInformationService/GetCatTypesCatLoverFaultFault", Name="CatLoverFault", Namespace="http://schemas.datacontract.org/2004/07/CoreWCF.Contracts")]
     System.Threading.Tasks.Task<GetCatTypesResponse> GetCatTypesAsync(GetCatTypesRequest request);
-    
-    [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICatInformationService/AllowBellyRub", ReplyAction="http://tempuri.org/ICatInformationService/AllowBellyRubResponse")]
-    System.Threading.Tasks.Task<AllowBellyRubResponse> AllowBellyRubAsync(AllowBellyRubRequest request);
 }
 
 [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -207,36 +204,6 @@ public partial class GetCatTypesResponse
     }
 }
 
-[System.Diagnostics.DebuggerStepThroughAttribute()]
-[System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-[System.ServiceModel.MessageContractAttribute(WrapperName="AllowBellyRub", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
-public partial class AllowBellyRubRequest
-{
-    
-    public AllowBellyRubRequest()
-    {
-    }
-}
-
-[System.Diagnostics.DebuggerStepThroughAttribute()]
-[System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-[System.ServiceModel.MessageContractAttribute(WrapperName="AllowBellyRubResponse", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
-public partial class AllowBellyRubResponse
-{
-    
-    [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
-    public bool AllowBellyRubResult;
-    
-    public AllowBellyRubResponse()
-    {
-    }
-    
-    public AllowBellyRubResponse(bool AllowBellyRubResult)
-    {
-        this.AllowBellyRubResult = AllowBellyRubResult;
-    }
-}
-
 [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
 public interface ICatInformationServiceChannel : ICatInformationService, System.ServiceModel.IClientChannel
 {
@@ -295,11 +262,6 @@ public partial class CatInformationServiceClient : System.ServiceModel.ClientBas
     public System.Threading.Tasks.Task<GetCatTypesResponse> GetCatTypesAsync(GetCatTypesRequest request)
     {
         return base.Channel.GetCatTypesAsync(request);
-    }
-    
-    public System.Threading.Tasks.Task<AllowBellyRubResponse> AllowBellyRubAsync(AllowBellyRubRequest request)
-    {
-        return base.Channel.AllowBellyRubAsync(request);
     }
     
     public virtual System.Threading.Tasks.Task OpenAsync()

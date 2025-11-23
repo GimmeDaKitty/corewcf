@@ -5,13 +5,14 @@ using CoreWCF.Contracts;
 
 namespace CoreWCF.Client.Services;
 
-public sealed class RestCatInformationProviderEasy(CatInformationServiceClient client) : ICatInformationProvider
+public sealed class RestCatInformationProviderEasy(CatInformationServiceClient catInformationServiceClient, 
+    BellyRubServiceClient bellyRubServiceClient) : ICatInformationProvider
 {
     public async Task<Result<byte[]>> GetCatPictureAsync()
     {
         try
         {
-            var response = await client.GetPhotoAsync(new GetPhotoRequest());
+            var response = await catInformationServiceClient.GetPhotoAsync(new GetPhotoRequest());
             return Result<byte[]>.OkResult(response.GetPhotoResult);
         }
         catch (Exception ex)
@@ -40,7 +41,7 @@ public sealed class RestCatInformationProviderEasy(CatInformationServiceClient c
             // the namespaces of the generated client/requests/responses include DataContractAttribute
             // for responses. So CatType is not seen here when the server.REST because Server.REST
             // ignores the DataContractAttribute namespaces.
-            var response = await client.GetCatTypesAsync(request);
+            var response = await catInformationServiceClient.GetCatTypesAsync(request);
 
             return Result<CatType[]>.OkResult(response.CatTypes);
         }
@@ -56,14 +57,13 @@ public sealed class RestCatInformationProviderEasy(CatInformationServiceClient c
         {
             var token = FakeJwtTokenGenerator.GenerateToken(humanType);
 
-            // TODO - BEA - CAN I DO THIS IN A MORE ELEGANT WAY THROUGH DI?
-            using (new OperationContextScope(client.InnerChannel))
+            using (new OperationContextScope(bellyRubServiceClient.InnerChannel))
             {
                 var httpRequestProperty = new HttpRequestMessageProperty();
                 httpRequestProperty.Headers["Authorization"] = $"Bearer {token}";
                 OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = httpRequestProperty;
 
-                var attemptBellyRub = await client.AllowBellyRubAsync(new AllowBellyRubRequest());
+                var attemptBellyRub = await bellyRubServiceClient.AllowBellyRubAsync(new AllowBellyRubRequest());
 
                 return attemptBellyRub.AllowBellyRubResult
                     ? Result.Ok
@@ -86,6 +86,5 @@ public sealed class RestCatInformationProviderEasy(CatInformationServiceClient c
         {
             return Result.NOk($"Error while processing request: {ex.Message}");
         }
-        
     }
 }

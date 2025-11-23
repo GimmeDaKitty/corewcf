@@ -32,7 +32,11 @@ else
 {
     builder.Services.AddTransient<CatInformationServiceClient>(_ => new CatInformationServiceClient(
         CatInformationServiceClient.EndpointConfiguration.BasicHttpBinding_ICatInformationService, 
-        new EndpointAddress(remoteServiceUrl)));
+        new EndpointAddress($"{remoteServiceUrl}CatInformationService")));
+    
+    builder.Services.AddTransient<BellyRubServiceClient>(_ => new BellyRubServiceClient(
+        BellyRubServiceClient.EndpointConfiguration.BasicHttpBinding_IBellyRubService, 
+        new EndpointAddress($"{remoteServiceUrl}BellyRubService")));
     
     builder.Services.AddScoped<ICatInformationProvider, RestCatInformationProviderEasy>(); 
 }

@@ -100,17 +100,16 @@ app.MapPost("/CatInformationService/GetPhoto", (
 
 });
 
-// LESS BAD - REQUIRES ROUTING - WORKS
-app.MapPost("/CatInformationService/AllowBellyRub", (
-    [FromServices] ICatInformationService catInformationService) =>
+app.MapPost("/BellyRubService/AllowBellyRub", (
+    [FromServices] IBellyRubService bellyRubService) =>
 {
-    var bellyRubAllowed = catInformationService.AllowBellyRub();
+    var bellyRubAllowed = bellyRubService.AllowBellyRub();
     var soapResponse = SoapResponseEnvelopeBuilder.GetSOAPBellyRubResponse(bellyRubAllowed);
     return Results.Content(soapResponse, "text/xml; charset=utf-8");
 })
 .RequireAuthorization("IsCoolHuman");
 
-// TODO - BEA - IMPLEMENT THE ALLOWBELLYRUB METHOD HERE
+
 // LESS BAD - REQUIRES ROUTING [DOES NOT WORK]
 // app.MapPost("/CatInformationService/GetCatTypes", async (
 //         [FromBody] GetCatTypesRequestEnvelope envelope, 
@@ -131,7 +130,8 @@ app.MapPost("/CatInformationService/AllowBellyRub", (
 
 // VERY BAD
 // app.MapPost("/CatInformationService", async (HttpContext httpContext, 
-//         [FromServices]ICatInformationService catInformationService) =>
+//         [FromServices]ICatInformationService catInformationService,
+//         [FromServices]IBellyRubService bellyRubService) =>
 //     {
 //         using var reader = new StreamReader(httpContext.Request.Body);
 //         var soapRequest = await reader.ReadToEndAsync();
@@ -143,6 +143,13 @@ app.MapPost("/CatInformationService/AllowBellyRub", (
 //         {
 //             var photo = catInformationService.GetPhoto();
 //             soapResponse = SoapResponseEnvelopeBuilder.GetSOAPPhotoResponse(photo);
+//             return Results.Content(soapResponse, "text/xml");
+//         }
+//         
+//         if (operation == "AllowBellyRub")
+//         {
+//             var bellyRubAllowed = bellyRubService.AllowBellyRub();
+//             soapResponse = SoapResponseEnvelopeBuilder.GetSOAPBellyRubResponse(bellyRubAllowed);
 //             return Results.Content(soapResponse, "text/xml");
 //         }
 //         

@@ -19,7 +19,6 @@ public sealed class CatInformationService(IHttpClientFactory httpClientFactory) 
         new CatType { RaceName = "Russian Blue", LikesChildren = true }
     };
 
-    [AllowAnonymous]
     public byte[] GetPhoto()
     {
         var httpClient = httpClientFactory.CreateClient();
@@ -27,10 +26,7 @@ public sealed class CatInformationService(IHttpClientFactory httpClientFactory) 
         response.EnsureSuccessStatusCode();
         return response.Content.ReadAsByteArrayAsync().Result;
     }
-
-    // ESTOY AQUI - COREWCF DOES NOT ALLOW TO MIX AUTHORIZED AND UNAUTHORIZED METHODS IN THE SAME SERVICE
-    // SO I NEED TO SPLIT IT INTO TWO DIFFERENT SERVICES
-    [AllowAnonymous]
+    
     public GetCatTypesResponse GetCatTypes(GetCatTypesRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.CatLoverHeader))
@@ -57,7 +53,4 @@ public sealed class CatInformationService(IHttpClientFactory httpClientFactory) 
             CatTypes = result
         };
     }
-
-    [Authorize(Policy = "IsCoolHuman")]
-    public bool AllowBellyRub() => true;
 }

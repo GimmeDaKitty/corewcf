@@ -10,8 +10,5 @@ namespace CoreWCF.Contracts
         [OperationContract]
         [CoreWCF.FaultContract(typeof(CatLoverFault))]
         GetCatTypesResponse GetCatTypes(GetCatTypesRequest request);
-        
-        [OperationContract]
-        bool AllowBellyRub();
     }
 }

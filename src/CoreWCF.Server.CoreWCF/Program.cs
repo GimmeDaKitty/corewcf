@@ -12,10 +12,11 @@ var builder = WebApplication.CreateBuilder();
 builder.Services.AddServiceModelServices();
 builder.Services.AddServiceModelMetadata();
 builder.Services.AddTransient<ICatInformationService, CatInformationService>();
+builder.Services.AddTransient<IBellyRubService, BellyRubService>();
 builder.Services.AddSingleton<IServiceBehavior, UseRequestHeadersForMetadataAddressBehavior>();
 builder.Services.AddSingleton<CatLoverHeaderBehavior>();
 builder.Services.AddHttpClient();
-builder.Services.AddTransient<CatInformationService>(); // If not added, you need an empty constructor on the service class
+
 
 // TODO - error handling
 //builder.Services.AddSingleton<IServiceBehavior, FaultContractAttribute>();
@@ -69,17 +70,27 @@ app.UseServiceModel(serviceBuilder =>
         ops.DebugBehavior.IncludeExceptionDetailInFaults = true;
     });
     
+    serviceBuilder.AddService<BellyRubService>(ops => 
+    {
+        ops.DebugBehavior.IncludeExceptionDetailInFaults = true;
+    });
+    
     serviceBuilder.AddServiceEndpoint<CatInformationService, ICatInformationService>(
-        Bindings.AuthorizationHttpBinding,
+        Bindings.BasicHttpBindingWithEncoding,
         "/CatInformationService", ep =>
         {
             var endpointBehavior = app.Services.GetRequiredService<CatLoverHeaderBehavior>();
             ep.EndpointBehaviors.Add(endpointBehavior);
         });
     
+    serviceBuilder.AddServiceEndpoint<BellyRubService, IBellyRubService>(
+        Bindings.AuthorizationHttpBinding, "/BellyRubService");
+    
+    // Enables metadata endpoint
+    //  https://localhost:5002/CatInformationService?wsdl
+    //  https://localhost:5002/BellyRubService?wsdl
     var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();
     serviceMetadataBehavior.HttpsGetEnabled = true;
-    // metadata available at: https://localhost:5002/CatInformationService?wsdl
 });
 
 app.Run();
