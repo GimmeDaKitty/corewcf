@@ -1,5 +1,6 @@
 ﻿using System.ServiceModel;
 using System.ServiceModel.Channels;
+using System.ServiceModel.Security;
 using CoreWCF.Contracts;
 
 namespace CoreWCF.Client.Services;
@@ -47,23 +48,40 @@ public sealed class RestCatInformationProviderEasy(CatInformationServiceClient c
 
     public async Task<Result> CanPetTheCatAsync(HumanType humanType)
     {
-        var token = FakeJwtTokenGenerator.GenerateToken(humanType);
-
-        // TODO - BEA - CAN I DO THIS IN A MORE ELEGANT WAY THROUGH DI?
-        // ESTOY AQUI - RUN WITH CLIENT.EASY AND SERVER.COREWCF.
-        // IF THIS WORKS, IMPLEMENT CLIENT.EASY AND SERVER.REST
-        // TRY CLIENT.HARD AND SERVER.REST AS WELL
-        using (new OperationContextScope(client.InnerChannel))
+        try
         {
-            var httpRequestProperty = new HttpRequestMessageProperty();
-            httpRequestProperty.Headers["Authorization"] = $"Bearer {token}";
-            OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = httpRequestProperty;
+            var token = FakeJwtTokenGenerator.GenerateToken(humanType);
 
-            var attemptBellyRub = await client.AttemptBellyRubAsync(new AttemptBellyRubRequest());
+            // TODO - BEA - CAN I DO THIS IN A MORE ELEGANT WAY THROUGH DI?
+            using (new OperationContextScope(client.InnerChannel))
+            {
+                var httpRequestProperty = new HttpRequestMessageProperty();
+                httpRequestProperty.Headers["Authorization"] = $"Bearer {token}";
+                OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = httpRequestProperty;
 
-            return attemptBellyRub.Allowed
-                ? Result.Ok
-                : Result.NOk("You dont have the rights to pet the cat");
+                var attemptBellyRub = await client.AttemptBellyRubAsync(new AttemptBellyRubRequest());
+
+                return attemptBellyRub.Allowed
+                    ? Result.Ok
+                    : Result.NOk("You dont have the rights to pet the cat");
+            }  
         }
+        catch (MessageSecurityException)
+        {
+            return Result.NOk("Authentication failed (401)");
+        }
+        catch (FaultException ex)
+        {
+            return Result.NOk($"Service error: {ex.Message}");
+        }
+        catch (CommunicationException ex)
+        {
+            return Result.NOk($"Communication error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            return Result.NOk($"Error while processing request: {ex.Message}");
+        }
+        
     }
 }

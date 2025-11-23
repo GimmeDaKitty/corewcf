@@ -1,4 +1,5 @@
 ﻿using CoreWCF.Contracts;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoreWCF.Server.Common.Services;
 
@@ -18,6 +19,7 @@ public sealed class CatInformationService(IHttpClientFactory httpClientFactory) 
         new CatType { RaceName = "Russian Blue", LikesChildren = true }
     };
 
+    [AllowAnonymous]
     public byte[] GetPhoto()
     {
         var httpClient = httpClientFactory.CreateClient();
@@ -26,6 +28,7 @@ public sealed class CatInformationService(IHttpClientFactory httpClientFactory) 
         return response.Content.ReadAsByteArrayAsync().Result;
     }
 
+    [AllowAnonymous]
     public GetCatTypesResponse GetCatTypes(GetCatTypesRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.CatLoverHeader))
@@ -53,6 +56,7 @@ public sealed class CatInformationService(IHttpClientFactory httpClientFactory) 
         };
     }
 
+    [Authorize(Policy = "IsCoolHuman")]
     public BellyRubResponse AttemptBellyRub()
     {
         return new BellyRubResponse { Allowed = true };

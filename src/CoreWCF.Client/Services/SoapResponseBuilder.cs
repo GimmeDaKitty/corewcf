@@ -33,10 +33,29 @@ public static class SoapResponseBuilder
             return DeserializeCatTypesResponse<TResponse>(node, ns);
         }
 
+        if (typeof(TResponse) == typeof(BellyRubResponse))
+        {
+            return DeserializeBellyRubResponse<TResponse>(node, ns);
+        }
+
         throw new NotSupportedException($"Type {typeof(TResponse).Name} not supported");
     }
 
-     private static TResponse DeserializeCatPhotoResponse<TResponse>(XmlNode node, XmlNamespaceManager ns)
+    private static TResponse DeserializeBellyRubResponse<TResponse>(XmlNode node, XmlNamespaceManager ns)
+    {
+        var allowedNode = node.SelectSingleNode("tem:Allowed", ns);
+        if (allowedNode == null)
+        {
+            throw new InvalidOperationException("Allowed node not found");
+        }
+        
+        return (TResponse)(object)new BellyRubResponse
+        {
+            Allowed = bool.Parse(allowedNode.InnerText)
+        };    
+    }
+
+    private static TResponse DeserializeCatPhotoResponse<TResponse>(XmlNode node, XmlNamespaceManager ns)
     {
         var photoResultNode = node.SelectSingleNode("tem:GetPhotoResult", ns);
         if (photoResultNode == null)
@@ -44,7 +63,7 @@ public static class SoapResponseBuilder
             throw new InvalidOperationException("GetPhotoResult node not found");
         }
         
-        return (TResponse)(object)new GetPhotoResponse()
+        return (TResponse)(object)new GetPhotoResponse
         {
             GetPhotoResult = Convert.FromBase64String(photoResultNode.InnerText)
         };

@@ -82,12 +82,15 @@ public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory
             
             var content = new StringContent(soapRequest, System.Text.Encoding.UTF8, "text/xml");
             content.Headers.Add("SOAPAction", AttemptBellyRubSoapAction);
-            content.Headers.Add("Authorization", $"Bearer {token}");
-            
-            var response = await httpClient.PostAsync("/CatInformationService", content);
+
+            using var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/CatInformationService");
+            requestMessage.Headers.Add("Authorization", $"Bearer {token}");
+            requestMessage.Content = content;
+            var response = await httpClient.SendAsync(requestMessage);
             
             if (response.IsSuccessStatusCode)
             {
+                var responseContent = await response.Content.ReadAsStringAsync();
                 var soapresponse = await SoapResponseBuilder.GetResponseAsync<BellyRubResponse>("BellyRubResponse", response);
                 return soapresponse.Allowed
                     ? Result.Ok

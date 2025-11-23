@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-
+﻿
 namespace CoreWCF.Contracts
 {
     [ServiceContract]
@@ -13,7 +12,6 @@ namespace CoreWCF.Contracts
         GetCatTypesResponse GetCatTypes(GetCatTypesRequest request);
         
         [OperationContract]
-        [Authorize(Policy = "IsCoolHuman")]
         BellyRubResponse AttemptBellyRub();
     }
 }

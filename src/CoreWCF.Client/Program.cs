@@ -2,6 +2,7 @@ using System.ServiceModel;
 using CoreWCF.Client;
 using CoreWCF.Client.Components;
 using CoreWCF.Client.Services;
+using Microsoft.IdentityModel.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,10 @@ else
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+
+// Auth debugging
+IdentityModelEventSource.ShowPII = true;
+builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Debug);
 
 var app = builder.Build();
 

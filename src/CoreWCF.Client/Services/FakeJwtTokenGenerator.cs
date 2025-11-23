@@ -16,14 +16,10 @@ public static class FakeJwtTokenGenerator
         var claimValue = GetClaimValue(humanType);
 
         var claims = new List<Claim>();
-        
-        if (claimValue != null)
-        {
-            claims.Add(new Claim("iscoolhuman", claimValue));
-        }
+        claims.Add(new Claim("iscoolhuman", claimValue));
         
         var token = new JwtSecurityToken(
-            issuer: "fake-issuer",
+            issuer: "https://fake-issuer.com",
             audience: "fake-audience",
             claims: claims,
             expires: DateTime.Now.AddHours(1),
@@ -33,15 +29,15 @@ public static class FakeJwtTokenGenerator
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
     
-    public static SymmetricSecurityKey GetSecurityKey() => 
+    private static SymmetricSecurityKey GetSecurityKey() => 
         new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(Secret));
 
-    private static string? GetClaimValue(HumanType humanType) =>
+    private static string GetClaimValue(HumanType humanType) =>
         humanType switch
         {
             HumanType.Owner => "owner",
             HumanType.AlergicToCats => "isalergic",
             HumanType.CatLady => "catlady",
-            _ => null
+            _ => "notacoolhuman"
         };
 }

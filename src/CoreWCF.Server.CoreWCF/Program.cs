@@ -4,6 +4,7 @@ using CoreWCF.Server.CoreWCF;
 using CoreWCF.Server.CoreWCF.Behaviors;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder();
@@ -23,25 +24,36 @@ builder.Services.AddTransient<CatInformationService>(); // If not added, you nee
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => 
     {
-        options.Authority = "fake-issuer";
-        options.Audience = "fake-audience";
+        options.RequireHttpsMetadata = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = false,
             ValidateAudience = false,
             ValidateLifetime = false,
-            RequireSignedTokens = false
+            RequireSignedTokens = false,
+            ValidateIssuerSigningKey = false,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                System.Text.Encoding.UTF8.GetBytes("this-is-a-super-secret-key-for-development-only-min-32-chars")
+            )
         };
     });
 
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("IsCoolHuman", new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
-        .RequireAuthenticatedUser()
-        .RequireClaim("iscoolhuman", ["owner", "isalergic", "catlady"])
-        .Build());
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("IsCoolHuman", policy =>
+    {
+        policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("iscoolhuman", "owner", "isalergic", "catlady");
+    });
+});
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+
+// Auth debugging
+IdentityModelEventSource.ShowPII = true;
+builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Debug);
 
 var app = builder.Build();
 
