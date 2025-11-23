@@ -7,7 +7,7 @@ public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory
 {
     private const string GetPhotoSoapAction = "http://tempuri.org/ICatInformationService/GetPhoto";
     private const string GetCatTypesSoapAction = "http://tempuri.org/ICatInformationService/GetCatTypes";
-    private const string AttemptBellyRubSoapAction = "http://tempuri.org/ICatInformationService/AttemptBellyRub";
+    private const string AllowBellyRubSoapAction = "http://tempuri.org/ICatInformationService/AllowBellyRub";
     
     public async Task<Result<byte[]>> GetCatPictureAsync()
     {
@@ -81,7 +81,7 @@ public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory
             var soapRequest = SoapRequestBuilder.BuildAttemptBellyRubRequest();
             
             var content = new StringContent(soapRequest, System.Text.Encoding.UTF8, "text/xml");
-            content.Headers.Add("SOAPAction", AttemptBellyRubSoapAction);
+            content.Headers.Add("SOAPAction", AllowBellyRubSoapAction);
 
             using var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/CatInformationService");
             requestMessage.Headers.Add("Authorization", $"Bearer {token}");
@@ -90,9 +90,8 @@ public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory
             
             if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                var soapresponse = await SoapResponseBuilder.GetResponseAsync<BellyRubResponse>("BellyRubResponse", response);
-                return soapresponse.Allowed
+                var soapresponse = await SoapResponseBuilder.GetResponseAsync<AllowBellyRubResponse>("AllowBellyRubResponse", response);
+                return soapresponse.AllowBellyRubResult
                     ? Result.Ok
                     : Result.NOk("You are not allowed to pet the cat.");
             }

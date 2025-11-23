@@ -6,8 +6,11 @@ using CoreWCF.Server.REST.Filters;
 using CoreWCF.Server.REST.Middleware;
 using CoreWCF.Server.REST.RestWrappers;
 using CoreWCF.Server.REST.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,8 +40,35 @@ builder.Services.AddControllers(options =>
     options.OutputFormatters.Add(xmlOutputFormatter);
 });
 
+// Authentication 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => 
+    {
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = false,
+            RequireSignedTokens = false,
+            ValidateIssuerSigningKey = false,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                System.Text.Encoding.UTF8.GetBytes("this-is-a-super-secret-key-for-development-only-min-32-chars")
+            )
+        };
+    });
+
+// Authorization for minimal APIs
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("IsCoolHuman", policy =>
+        policy.RequireClaim("iscoolhuman", "owner", "isalergic", "catlady"));
+
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+
+// Auth debugging
+IdentityModelEventSource.ShowPII = true;
+builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Debug);
 
 var app = builder.Build();
 
@@ -54,16 +84,33 @@ app.UseMiddleware<SoapHeaderLoggingMiddleware>();
 app.UseMiddleware<SoapRoutingMiddleware>();
 app.UseRouting();
 
+// Authentication
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseHttpsRedirection();
 
 // LESS BAD - REQUIRES ROUTING - WORKS
-app.MapPost("/CatInformationService/GetPhoto", async (
+app.MapPost("/CatInformationService/GetPhoto", (
     [FromServices] ICatInformationService catInformationService) =>
 {
     var photo = catInformationService.GetPhoto();
-    return SoapResponseEnvelopeBuilder.GetSOAPPhotoResponse(photo);
+    var soapResponse = SoapResponseEnvelopeBuilder.GetSOAPPhotoResponse(photo);
+    return Results.Content(soapResponse, "text/xml; charset=utf-8");
+
 });
 
+// LESS BAD - REQUIRES ROUTING - WORKS
+app.MapPost("/CatInformationService/AllowBellyRub", (
+    [FromServices] ICatInformationService catInformationService) =>
+{
+    var bellyRubAllowed = catInformationService.AllowBellyRub();
+    var soapResponse = SoapResponseEnvelopeBuilder.GetSOAPBellyRubResponse(bellyRubAllowed);
+    return Results.Content(soapResponse, "text/xml; charset=utf-8");
+})
+.RequireAuthorization("IsCoolHuman");
+
+// TODO - BEA - IMPLEMENT THE ALLOWBELLYRUB METHOD HERE
 // LESS BAD - REQUIRES ROUTING [DOES NOT WORK]
 // app.MapPost("/CatInformationService/GetCatTypes", async (
 //         [FromBody] GetCatTypesRequestEnvelope envelope, 

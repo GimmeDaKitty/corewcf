@@ -20,7 +20,7 @@
     }
     else if (_hasError)
     {
-        <p class="text-danger">Unfortunately you are not worthy of the kitty gods...</p>
+        <p class="text-danger">@_errorMessage</p>
         <img src="/images/error.jpg" alt="Placeholder cat" style="max-width: 500px;" />
     }
 </div>
@@ -29,6 +29,7 @@
     private byte[]? _catImageData;
     private bool _isLoading;
     private bool _hasError;
+    private string? _errorMessage;
 
     private async Task GetCatPicture()
     {
@@ -45,6 +46,7 @@
         else
         {
             _hasError = true;
+            _errorMessage = result.Error;
         }
     
         _isLoading = false;

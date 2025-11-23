@@ -12,6 +12,6 @@ namespace CoreWCF.Contracts
         GetCatTypesResponse GetCatTypes(GetCatTypesRequest request);
         
         [OperationContract]
-        BellyRubResponse AttemptBellyRub();
+        bool AllowBellyRub();
     }
 }

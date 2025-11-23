@@ -36,6 +36,10 @@ public sealed class RestCatInformationProviderEasy(CatInformationServiceClient c
                 RequestTimestamp = requestDateTime
             };
 
+            // TODO - BEA - FIX? - when using REST with client type Easy, ot does not work
+            // the namespaces of the generated client/requests/responses include DataContractAttribute
+            // for responses. So CatType is not seen here when the server.REST because Server.REST
+            // ignores the DataContractAttribute namespaces.
             var response = await client.GetCatTypesAsync(request);
 
             return Result<CatType[]>.OkResult(response.CatTypes);
@@ -59,9 +63,9 @@ public sealed class RestCatInformationProviderEasy(CatInformationServiceClient c
                 httpRequestProperty.Headers["Authorization"] = $"Bearer {token}";
                 OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = httpRequestProperty;
 
-                var attemptBellyRub = await client.AttemptBellyRubAsync(new AttemptBellyRubRequest());
+                var attemptBellyRub = await client.AllowBellyRubAsync(new AllowBellyRubRequest());
 
-                return attemptBellyRub.Allowed
+                return attemptBellyRub.AllowBellyRubResult
                     ? Result.Ok
                     : Result.NOk("You dont have the rights to pet the cat");
             }  

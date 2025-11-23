@@ -33,7 +33,7 @@ public static class SoapResponseBuilder
             return DeserializeCatTypesResponse<TResponse>(node, ns);
         }
 
-        if (typeof(TResponse) == typeof(BellyRubResponse))
+        if (typeof(TResponse) == typeof(AllowBellyRubResponse))
         {
             return DeserializeBellyRubResponse<TResponse>(node, ns);
         }
@@ -49,9 +49,9 @@ public static class SoapResponseBuilder
             throw new InvalidOperationException("Allowed node not found");
         }
         
-        return (TResponse)(object)new BellyRubResponse
+        return (TResponse)(object)new AllowBellyRubResponse
         {
-            Allowed = bool.Parse(allowedNode.InnerText)
+            AllowBellyRubResult = bool.Parse(allowedNode.InnerText)
         };    
     }
 

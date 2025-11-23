@@ -115,8 +115,8 @@ public interface ICatInformationService
     [System.ServiceModel.FaultContractAttribute(typeof(CoreWCF.Contracts.CatLoverFault), Action="http://tempuri.org/ICatInformationService/GetCatTypesCatLoverFaultFault", Name="CatLoverFault", Namespace="http://schemas.datacontract.org/2004/07/CoreWCF.Contracts")]
     System.Threading.Tasks.Task<GetCatTypesResponse> GetCatTypesAsync(GetCatTypesRequest request);
     
-    [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICatInformationService/AttemptBellyRub", ReplyAction="http://tempuri.org/ICatInformationService/AttemptBellyRubResponse")]
-    System.Threading.Tasks.Task<BellyRubResponse> AttemptBellyRubAsync(AttemptBellyRubRequest request);
+    [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICatInformationService/AllowBellyRub", ReplyAction="http://tempuri.org/ICatInformationService/AllowBellyRubResponse")]
+    System.Threading.Tasks.Task<AllowBellyRubResponse> AllowBellyRubAsync(AllowBellyRubRequest request);
 }
 
 [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -209,31 +209,31 @@ public partial class GetCatTypesResponse
 
 [System.Diagnostics.DebuggerStepThroughAttribute()]
 [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-[System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-public partial class AttemptBellyRubRequest
+[System.ServiceModel.MessageContractAttribute(WrapperName="AllowBellyRub", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+public partial class AllowBellyRubRequest
 {
     
-    public AttemptBellyRubRequest()
+    public AllowBellyRubRequest()
     {
     }
 }
 
 [System.Diagnostics.DebuggerStepThroughAttribute()]
 [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-[System.ServiceModel.MessageContractAttribute(WrapperName="BellyRubResponse", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
-public partial class BellyRubResponse
+[System.ServiceModel.MessageContractAttribute(WrapperName="AllowBellyRubResponse", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
+public partial class AllowBellyRubResponse
 {
     
     [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
-    public bool Allowed;
+    public bool AllowBellyRubResult;
     
-    public BellyRubResponse()
+    public AllowBellyRubResponse()
     {
     }
     
-    public BellyRubResponse(bool Allowed)
+    public AllowBellyRubResponse(bool AllowBellyRubResult)
     {
-        this.Allowed = Allowed;
+        this.AllowBellyRubResult = AllowBellyRubResult;
     }
 }
 
@@ -297,9 +297,9 @@ public partial class CatInformationServiceClient : System.ServiceModel.ClientBas
         return base.Channel.GetCatTypesAsync(request);
     }
     
-    public System.Threading.Tasks.Task<BellyRubResponse> AttemptBellyRubAsync(AttemptBellyRubRequest request)
+    public System.Threading.Tasks.Task<AllowBellyRubResponse> AllowBellyRubAsync(AllowBellyRubRequest request)
     {
-        return base.Channel.AttemptBellyRubAsync(request);
+        return base.Channel.AllowBellyRubAsync(request);
     }
     
     public virtual System.Threading.Tasks.Task OpenAsync()

@@ -4,6 +4,7 @@ using CoreWCF.Server.REST.RestWrappers;
 using Microsoft.AspNetCore.Mvc;
 using System.Xml.Serialization;
 using CoreWCF.Server.REST.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoreWCF.Server.REST.Controllers;
 
@@ -17,6 +18,7 @@ public class CatInformationController(
     /// <summary>
     /// GetCatTypes SOAP endpoint - equivalent to the minimal API in Program.cs line 60
     /// </summary>
+    [AllowAnonymous]
     [HttpPost("GetCatTypes")]
     [Consumes("text/xml", "application/xml")]
     [Produces("text/xml")]

@@ -18,6 +18,7 @@ public sealed class SoapRoutingMiddleware(RequestDelegate next, ILogger<SoapRout
                 {
                     "GetPhoto" => "/CatInformationService/GetPhoto",
                     "GetCatTypes" => "/CatInformationService/GetCatTypes",
+                    "AllowBellyRub" => "/CatInformationService/AllowBellyRub",
                     _ => context.Request.Path
                 };
 

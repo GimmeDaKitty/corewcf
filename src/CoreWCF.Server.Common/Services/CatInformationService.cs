@@ -28,6 +28,8 @@ public sealed class CatInformationService(IHttpClientFactory httpClientFactory) 
         return response.Content.ReadAsByteArrayAsync().Result;
     }
 
+    // ESTOY AQUI - COREWCF DOES NOT ALLOW TO MIX AUTHORIZED AND UNAUTHORIZED METHODS IN THE SAME SERVICE
+    // SO I NEED TO SPLIT IT INTO TWO DIFFERENT SERVICES
     [AllowAnonymous]
     public GetCatTypesResponse GetCatTypes(GetCatTypesRequest request)
     {
@@ -57,8 +59,5 @@ public sealed class CatInformationService(IHttpClientFactory httpClientFactory) 
     }
 
     [Authorize(Policy = "IsCoolHuman")]
-    public BellyRubResponse AttemptBellyRub()
-    {
-        return new BellyRubResponse { Allowed = true };
-    }
+    public bool AllowBellyRub() => true;
 }

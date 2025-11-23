@@ -32,6 +32,11 @@ public static class SoapRequestOperationExtractor
         {
             return "GetCatTypes";
         }
+        
+        if (xmlDoc.SelectSingleNode("//tem:AllowBellyRub", ns) != null)
+        {
+            return "AllowBellyRub";
+        }
 
         throw new InvalidOperationException("Unknown SOAP operation");
     }

@@ -31,7 +31,8 @@
         }
         else
         {
-            <p style="color: red; font-weight: bold;">Yeah, absolutely not</p>
+            <h3 style="color: red;">Yeah, absolutely not</h3>
+            <p stype="color: red; font-style: italic;">@_errorMessage</p>
         }
     }
 </div>
@@ -39,6 +40,7 @@
 @code {
     private bool? _canPet;
     private bool _isLoading;
+    private string? _errorMessage;
     private HumanType _selectedHumanType = HumanType.RandomPerson;
 
     private async Task CheckIfCanPet()
@@ -49,6 +51,7 @@
         var result = await CatInformationProvider.CanPetTheCatAsync(_selectedHumanType);
 
         _canPet = result.IsSuccess;
+        _errorMessage = result.Error;
         _isLoading = false;
     }
 }
