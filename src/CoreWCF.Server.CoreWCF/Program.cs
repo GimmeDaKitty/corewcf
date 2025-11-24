@@ -11,12 +11,11 @@ var builder = WebApplication.CreateBuilder();
 
 builder.Services.AddServiceModelServices();
 builder.Services.AddServiceModelMetadata();
-builder.Services.AddTransient<ICatInformationService, CatInformationService>();
-builder.Services.AddTransient<IBellyRubService, BellyRubService>();
+builder.Services.AddSingleton<CatInformationService>();
+builder.Services.AddSingleton<BellyRubService>(); // Moet als Singleton omdat CoreWCF anders een default lege constructor nodig heeft
 builder.Services.AddSingleton<IServiceBehavior, UseRequestHeadersForMetadataAddressBehavior>();
 builder.Services.AddSingleton<CatLoverHeaderBehavior>();
 builder.Services.AddHttpClient();
-
 
 // TODO - error handling
 //builder.Services.AddSingleton<IServiceBehavior, FaultContractAttribute>();
