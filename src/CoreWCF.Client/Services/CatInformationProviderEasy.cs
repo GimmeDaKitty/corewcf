@@ -5,10 +5,24 @@ using CoreWCF.Contracts;
 
 namespace CoreWCF.Client.Services;
 
-public sealed class CatInformationProviderEasy(CatInformationServiceClient catInformationServiceClient, 
+public sealed class CatInformationProviderEasy(
+    CatFactsServiceClient catFactsServiceClient, 
+    CatInformationServiceClient catInformationServiceClient, 
     FakeJwtTokenProvider tokenProvider,
     BellyRubServiceClient bellyRubServiceClient) : ICatInformationProvider
 {
+    public async Task<Result<string>> GetCatFactAsync()
+    {
+        try
+        {
+            var response = await catFactsServiceClient.GetCatFactAsync(new GetCatFactRequest());
+            return Result<string>.OkResult(response.Fact);
+        }
+        catch (Exception ex)
+        {
+            return Result<string>.NOkResult($"Error while processing request: {ex.Message}");
+        }    }
+
     public async Task<Result<byte[]>> GetCatPictureAsync()
     {
         try

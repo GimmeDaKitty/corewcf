@@ -5,7 +5,6 @@ namespace CoreWCF.Client.Services;
 
 public static class SoapResponseBuilder
 {
-    // TODO - BEA - THIS IS NOT REALLY GENERIC IS IT
     public static async Task<TResponse> GetResponseAsync<TResponse>(string nodeName, HttpResponseMessage response)
     {
         var responseXml = await response.Content.ReadAsStringAsync();
@@ -21,6 +20,11 @@ public static class SoapResponseBuilder
         if (node == null)
         {
             throw new InvalidOperationException($"Node {nodeName} not found in response");
+        }
+        
+        if (typeof(TResponse) == typeof(CatFactResponse))
+        {
+            return DeserializeCatPhotoResponse<TResponse>(node, ns);
         }
         
         if (typeof(TResponse) == typeof(GetPhotoResponse))

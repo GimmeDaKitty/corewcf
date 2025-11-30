@@ -1,0 +1,55 @@
+@page "/catfact"
+@using CoreWCF.Client.Services
+@inject ICatInformationProvider CatInformationProvider
+
+<PageTitle>Get Cat Fact</PageTitle>
+
+<h1>Get a cat fact</h1>
+
+<button class="btn btn-primary" @onclick="GetCatFact">Show me</button>
+
+<div class="mt-3">
+    @if (_isLoading)
+    {
+        <p>Loading...</p>
+    }
+    else if (_hasError)
+    {
+        <p style="color: red;"><strong>Uh oh, an error occurred</strong></p>
+        <p style="color: red;">@_errorMessage</p>
+    }
+    else if (!string.IsNullOrEmpty(_catFact))
+    {
+        <p><strong>Did you know...</strong> @_catFact</p>
+    }
+</div>
+
+@code {
+    private string? _catFact;
+    private bool _isLoading;
+    private bool _hasError;
+    private string? _errorMessage;
+
+    private async Task GetCatFact()
+    {
+        _isLoading = true;
+        _catFact = null;
+        _hasError = false;
+        _errorMessage = null;
+
+        var result = await CatInformationProvider.GetCatFactAsync();
+
+        if (result.IsSuccess)
+        {
+            _catFact = result.Value;
+        }
+        else
+        {
+            _hasError = true;
+            _errorMessage = result.Error;
+        }
+
+        _isLoading = false;
+    }
+}
+

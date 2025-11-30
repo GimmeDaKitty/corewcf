@@ -10,8 +10,13 @@ var builder = WebApplication.CreateBuilder();
 
 builder.Services.AddServiceModelServices();
 builder.Services.AddServiceModelMetadata();
+
+// Service implementations. Moeten Singleton zijn omdat CoreWCF anders een default lege constructor nodig heeft
+builder.Services.AddSingleton<CatFactsService>();
 builder.Services.AddSingleton<CatInformationService>();
-builder.Services.AddSingleton<BellyRubService>(); // Moet als Singleton omdat CoreWCF anders een default lege constructor nodig heeft
+builder.Services.AddSingleton<BellyRubService>(); 
+
+// Behaviors
 builder.Services.AddSingleton<IServiceBehavior, UseRequestHeadersForMetadataAddressBehavior>();
 builder.Services.AddSingleton<CatInformationServiceEndpointBehaviors>();
 builder.Services.AddSingleton<CatInformationServiceOperationBehaviors>();
@@ -64,6 +69,11 @@ app.UseAuthorization();
 // Service configuration
 app.UseServiceModel(serviceBuilder =>
 {
+    serviceBuilder.AddService<CatFactsService>(ops =>
+    {
+        ops.DebugBehavior.IncludeExceptionDetailInFaults = true;
+    });
+    
     serviceBuilder.AddService<CatInformationService>(ops => 
     {
         ops.DebugBehavior.IncludeExceptionDetailInFaults = true;
@@ -73,6 +83,9 @@ app.UseServiceModel(serviceBuilder =>
     {
         ops.DebugBehavior.IncludeExceptionDetailInFaults = true;
     });
+    
+    serviceBuilder.AddServiceEndpoint<CatFactsService, ICatFactsService>(
+        Bindings.BasicHttpBindingWithEncoding, "/CatFactsService");
     
     serviceBuilder.AddServiceEndpoint<CatInformationService, ICatInformationService>(
         Bindings.BasicHttpBindingWithEncoding,
@@ -90,6 +103,7 @@ app.UseServiceModel(serviceBuilder =>
         Bindings.AuthorizationHttpBinding, "/BellyRubService");
     
     // Enables metadata endpoint
+    //  https://localhost:5002/CatFactsService?wsdl
     //  https://localhost:5002/CatInformationService?wsdl
     //  https://localhost:5002/BellyRubService?wsdl
     var serviceMetadataBehavior = app.Services.GetRequiredService<ServiceMetadataBehavior>();

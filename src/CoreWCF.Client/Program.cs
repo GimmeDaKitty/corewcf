@@ -33,6 +33,10 @@ if (clientType == DifficultyLevel.Hard)
 }
 else
 {
+    builder.Services.AddTransient<CatFactsServiceClient>(_ => new CatFactsServiceClient(
+        CatFactsServiceClient.EndpointConfiguration.BasicHttpBinding_ICatFactsService, 
+        new EndpointAddress($"{remoteServiceUrl}CatFactsService")));
+    
     builder.Services.AddTransient<CatInformationServiceClient>(_ => new CatInformationServiceClient(
         CatInformationServiceClient.EndpointConfiguration.BasicHttpBinding_ICatInformationService, 
         new EndpointAddress($"{remoteServiceUrl}CatInformationService")));
