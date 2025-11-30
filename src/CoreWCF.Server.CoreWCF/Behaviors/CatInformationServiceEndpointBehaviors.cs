@@ -2,7 +2,7 @@
 
 namespace CoreWCF.Server.CoreWCF.Behaviors;
 
-public class CatLoverHeaderBehavior(ILogger<CatLoverHeaderInspector> logger) : IEndpointBehavior
+public class CatInformationServiceEndpointBehaviors(ILogger<CatLoverHeaderInspector> logger) : IEndpointBehavior
 {
     public void AddBindingParameters(ServiceEndpoint endpoint, BindingParameterCollection bindingParameters)
     {

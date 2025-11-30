@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CoreWCF.Server.REST.Controllers;
 
+[AllowAnonymous]
 [ApiController]
 [Route("CatInformationService")]
 public class CatInformationController(

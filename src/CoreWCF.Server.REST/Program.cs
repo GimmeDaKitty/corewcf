@@ -1,10 +1,7 @@
-using System.Xml.Serialization;
 using CoreWCF.Contracts;
 using CoreWCF.Server.Common.Services;
-using CoreWCF.Server.REST;
 using CoreWCF.Server.REST.Filters;
 using CoreWCF.Server.REST.Middleware;
-using CoreWCF.Server.REST.RestWrappers;
 using CoreWCF.Server.REST.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +11,13 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
 builder.Services.AddHttpClient();
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+// Services
 builder.Services.AddTransient<ICatInformationService, CatInformationService>();
+builder.Services.AddTransient<IBellyRubService, BellyRubService>();
 
 // Controllers
 builder.Services.AddScoped<SoapAuthorizationFilter>();
@@ -40,7 +41,7 @@ builder.Services.AddControllers(options =>
     options.OutputFormatters.Add(xmlOutputFormatter);
 });
 
-// Authentication 
+// Authorization for controllers
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => 
     {
@@ -63,9 +64,6 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy("IsCoolHuman", policy =>
         policy.RequireClaim("iscoolhuman", "owner", "isalergic", "catlady"));
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-
 // Auth debugging
 IdentityModelEventSource.ShowPII = true;
 builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Debug);
@@ -79,6 +77,7 @@ if (app.Environment.IsDevelopment())
 
 // Middleware
 app.UseMiddleware<SoapHeaderLoggingMiddleware>();
+app.UseMiddleware<RequestIdLoggingMiddleware>();
 
 // Routing for SOAP-as-REST
 app.UseMiddleware<SoapRoutingMiddleware>();
@@ -90,6 +89,8 @@ app.UseAuthorization();
 
 app.UseHttpsRedirection();
 
+// -------------------------------------------------------------------
+
 // LESS BAD - REQUIRES ROUTING - WORKS
 app.MapPost("/CatInformationService/GetPhoto", (
     [FromServices] ICatInformationService catInformationService) =>
@@ -100,7 +101,7 @@ app.MapPost("/CatInformationService/GetPhoto", (
 
 });
 
-app.MapPost("/BellyRubService/AllowBellyRub", (
+app.MapPost("/BellyRubService", (
     [FromServices] IBellyRubService bellyRubService) =>
 {
     var bellyRubAllowed = bellyRubService.AllowBellyRub();

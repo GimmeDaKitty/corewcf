@@ -23,10 +23,6 @@ public class SoapHeaderLoggingMiddleware(RequestDelegate next, ILogger<SoapHeade
             {
                 logger.LogInformation("CatLoverHeader found in SOAP request: {CatLoverHeader}", catLoverHeader);
             }
-            else
-            {
-                logger.LogWarning("No CatLoverHeader found in SOAP request");
-            }
         }
 
         await next(context);
@@ -51,7 +47,7 @@ public class SoapHeaderLoggingMiddleware(RequestDelegate next, ILogger<SoapHeade
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Error extracting CatLoverHeader from SOAP request");
+            logger.LogError(ex, "Error extracting CatLoverHeader from SOAP request");
             return null;
         }
     }

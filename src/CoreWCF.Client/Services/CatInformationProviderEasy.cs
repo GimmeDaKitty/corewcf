@@ -5,7 +5,8 @@ using CoreWCF.Contracts;
 
 namespace CoreWCF.Client.Services;
 
-public sealed class RestCatInformationProviderEasy(CatInformationServiceClient catInformationServiceClient, 
+public sealed class CatInformationProviderEasy(CatInformationServiceClient catInformationServiceClient, 
+    FakeJwtTokenProvider tokenProvider,
     BellyRubServiceClient bellyRubServiceClient) : ICatInformationProvider
 {
     public async Task<Result<byte[]>> GetCatPictureAsync()
@@ -55,22 +56,36 @@ public sealed class RestCatInformationProviderEasy(CatInformationServiceClient c
     {
         try
         {
-            var token = FakeJwtTokenGenerator.GenerateToken(humanType);
+            tokenProvider.SetScope(humanType);
 
+            // Dynamic Auth Injection //////////////////////
             using (new OperationContextScope(bellyRubServiceClient.InnerChannel))
             {
                 var httpRequestProperty = new HttpRequestMessageProperty();
-                httpRequestProperty.Headers["Authorization"] = $"Bearer {token}";
+                httpRequestProperty.Headers["Authorization"] = $"Bearer {tokenProvider.GenerateToken()}";
                 OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = httpRequestProperty;
-
+            
                 var attemptBellyRub = await bellyRubServiceClient.AllowBellyRubAsync(new AllowBellyRubRequest());
-
+            
                 return attemptBellyRub.AllowBellyRubResult
                     ? Result.Ok
                     : Result.NOk("You dont have the rights to pet the cat");
             }  
+            
+            // AUTH from DI //////////////////////
+            // var attemptBellyRub = await bellyRubServiceClient.AllowBellyRubAsync(new AllowBellyRubRequest());
+            //
+            // return attemptBellyRub.AllowBellyRubResult
+            // ? Result.Ok
+            // : Result.NOk("You dont have the rights to pet the cat");
         }
         catch (MessageSecurityException)
+        {
+            return Result.NOk("Authentication failed (401)");
+        }
+        catch (CommunicationException ex) when (ex.Message.Contains("Access is denied") || 
+                                                ex.Message.Contains("401") ||
+                                                ex.InnerException?.Message.Contains("401") == true)
         {
             return Result.NOk("Authentication failed (401)");
         }

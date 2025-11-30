@@ -4,16 +4,22 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 
-public static class FakeJwtTokenGenerator
+public class FakeJwtTokenProvider
 {
+    private HumanType _humanType;
     private const string Secret = "this-is-a-super-secret-key-for-development-only-min-32-chars";
+
+    public void SetScope(HumanType humanType)
+    {
+        _humanType = humanType;
+    }
     
-    public static string GenerateToken(HumanType humanType)
+    public string GenerateToken()
     {
         var securityKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(Secret));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var claimValue = GetClaimValue(humanType);
+        var claimValue = GetClaimValue(_humanType);
 
         var claims = new List<Claim>();
         claims.Add(new Claim("iscoolhuman", claimValue));

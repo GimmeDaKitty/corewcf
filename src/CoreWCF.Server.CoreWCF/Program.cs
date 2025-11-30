@@ -3,7 +3,6 @@ using CoreWCF.Server.Common.Services;
 using CoreWCF.Server.CoreWCF;
 using CoreWCF.Server.CoreWCF.Behaviors;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 
@@ -14,7 +13,8 @@ builder.Services.AddServiceModelMetadata();
 builder.Services.AddSingleton<CatInformationService>();
 builder.Services.AddSingleton<BellyRubService>(); // Moet als Singleton omdat CoreWCF anders een default lege constructor nodig heeft
 builder.Services.AddSingleton<IServiceBehavior, UseRequestHeadersForMetadataAddressBehavior>();
-builder.Services.AddSingleton<CatLoverHeaderBehavior>();
+builder.Services.AddSingleton<CatInformationServiceEndpointBehaviors>();
+builder.Services.AddSingleton<CatInformationServiceOperationBehaviors>();
 builder.Services.AddHttpClient();
 
 // TODO - error handling
@@ -78,8 +78,12 @@ app.UseServiceModel(serviceBuilder =>
         Bindings.BasicHttpBindingWithEncoding,
         "/CatInformationService", ep =>
         {
-            var endpointBehavior = app.Services.GetRequiredService<CatLoverHeaderBehavior>();
+            var endpointBehavior = app.Services.GetRequiredService<CatInformationServiceEndpointBehaviors>();
             ep.EndpointBehaviors.Add(endpointBehavior);
+
+            var operationBehavior = app.Services.GetRequiredService<CatInformationServiceOperationBehaviors>();
+            var getCatTypesOperation = ep.Contract.Operations.First(o => o.Name == nameof(ICatInformationService.GetCatTypes));
+            getCatTypesOperation.OperationBehaviors.Add(operationBehavior);
         });
     
     serviceBuilder.AddServiceEndpoint<BellyRubService, IBellyRubService>(

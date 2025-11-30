@@ -7,7 +7,7 @@
 <h1>Pet The Cat</h1>
 
 <div class="mb-3">
-    <label for="humanTypeDropdown" class="form-label">What kind of human are you?</label>
+    <label for="humanTypeDropdown" class="form-label">But first let's check whether you are cool. What kind of human are you?</label>
     <select id="humanTypeDropdown" class="form-select" @bind="_selectedHumanType">
         @foreach (HumanType humanType in Enum.GetValues(typeof(HumanType)))
         {
@@ -32,7 +32,7 @@
         else
         {
             <h3 style="color: red;">Yeah, absolutely not</h3>
-            <p stype="color: red; font-style: italic;">@_errorMessage</p>
+            <p style="color: red; font-style: italic;">@_errorMessage</p>
         }
     }
 </div>

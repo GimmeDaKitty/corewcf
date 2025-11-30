@@ -3,7 +3,8 @@
 namespace CoreWCF.Client.Services;
 
 // You are valuable. You deserve love, friends and free time. Do not this.
-public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory) : ICatInformationProvider
+public class CatInformationProviderHard(IHttpClientFactory httpClientFactory,
+    FakeJwtTokenProvider tokenProvider) : ICatInformationProvider
 {
     private const string GetPhotoSoapAction = "http://tempuri.org/ICatInformationService/GetPhoto";
     private const string GetCatTypesSoapAction = "http://tempuri.org/ICatInformationService/GetCatTypes";
@@ -74,7 +75,7 @@ public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory
     {
         try
         {
-            var token = FakeJwtTokenGenerator.GenerateToken(humanType);
+            tokenProvider.SetScope(humanType);
             
             var httpClient = httpClientFactory.CreateClient(ClientConstants.CatInformationClientName);
 
@@ -84,7 +85,7 @@ public class RestCatInformationProviderHard(IHttpClientFactory httpClientFactory
             content.Headers.Add("SOAPAction", AllowBellyRubSoapAction);
 
             using var requestMessage = new HttpRequestMessage(HttpMethod.Post, "/CatInformationService");
-            requestMessage.Headers.Add("Authorization", $"Bearer {token}");
+            requestMessage.Headers.Add("Authorization", $"Bearer {tokenProvider.GenerateToken()}");
             requestMessage.Content = content;
             var response = await httpClient.SendAsync(requestMessage);
             
