@@ -1,7 +1,7 @@
 using CoreWCF.Server.REST.Middleware;
-using CoreWCF.Server.REST.RestWrappers;
 using CoreWCF.Server.REST.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +13,25 @@ builder.Logging.AddConsole();
 builder.Services.AddHttpClient();
 builder.Services.AddTransient<ICatFactsService, CatFactsService>();
 builder.Services.AddTransient<ICatInformationService, CatInformationService>();
+
+// Controllers
+builder.Services.AddControllers(options =>
+{
+    options.InputFormatters.RemoveType<XmlSerializerInputFormatter>();
+    options.OutputFormatters.RemoveType<XmlSerializerOutputFormatter>();
+    
+    var xmlInputFormatter = new XmlSerializerInputFormatter(options);
+    xmlInputFormatter.SupportedMediaTypes.Clear();
+    xmlInputFormatter.SupportedMediaTypes.Add("text/xml");
+    xmlInputFormatter.SupportedMediaTypes.Add("application/xml");
+    options.InputFormatters.Add(xmlInputFormatter);
+
+    var xmlOutputFormatter = new XmlSerializerOutputFormatter();
+    xmlOutputFormatter.SupportedMediaTypes.Clear();
+    xmlOutputFormatter.SupportedMediaTypes.Add("text/xml");
+    xmlOutputFormatter.SupportedMediaTypes.Add("application/xml");
+    options.OutputFormatters.Add(xmlOutputFormatter);
+});
 
 var app = builder.Build();
 
@@ -40,21 +59,6 @@ app.MapPost("/CatInformationService/GetPhoto", async(
     return Results.Content(soapResponse, "text/xml");
 });
 
-app.MapPost("/CatInformationService/GetCatTypes", async (
-    [FromBody] GetCatTypesRequestEnvelope envelope,
-    [FromServices] ICatInformationService catInformationService) =>
-{
-    envelope.Body.Request.CatLoverHeader = envelope.Header.CatLoverHeader;
-    var response = new GetCatTypesResponseEnvelope
-    {
-        Body = new GetCatTypesResponseBody
-        {
-            Response = await catInformationService.GetCatTypesAsync(envelope.Body.Request)
-        }
-    };
-
-    // Generic serializer can be used here because the response wrapper contains namespace info
-    return await GenericSerializer.Serialize(response);
-});
+app.MapControllers();
 
 app.Run();
