@@ -1,29 +1,23 @@
-﻿
-namespace CoreWCF.Server.REST.Services;
+﻿namespace CoreWCF.Server.REST.Services;
 
 public static class SoapRequestOperationExtractor
 {
-    public static string GetSoapOperation(string soapRequest)
+    public static async Task<string> GetSoapOperation(HttpContext httpContext)
     {
-        var xmlDoc = new System.Xml.XmlDocument();
-        xmlDoc.LoadXml(soapRequest);
+        var soapAction = httpContext.Request.Headers["SOAPAction"].FirstOrDefault();
 
-        var ns = new System.Xml.XmlNamespaceManager(xmlDoc.NameTable);
-        ns.AddNamespace("s", "http://schemas.xmlsoap.org/soap/envelope/");
-        ns.AddNamespace("tem", "http://tempuri.org/");
-
-        if (xmlDoc.SelectSingleNode("//tem:GetPhoto", ns) != null)
+        if (string.IsNullOrWhiteSpace(soapAction))
         {
-            return "GetPhoto";
+            throw new InvalidOperationException("Incoming request is not a valid SOAP request: Missing SOAPAction header.");
         }
 
-        if (xmlDoc.SelectSingleNode("//tem:GetCatTypesRequest", ns) != null)
-        {
-            return "GetCatTypes";
-        }
-
-        // Other operations here.....
-
-        throw new InvalidOperationException("Unknown SOAP operation");
+        var operationName = soapAction
+            .Trim('"')
+            .Split('/')
+            .LastOrDefault();
+        
+        return !string.IsNullOrWhiteSpace(operationName) 
+            ? operationName
+            : throw new InvalidOperationException($"Could not extract operation name from SOAPAction: {soapAction}");
     }
 }
