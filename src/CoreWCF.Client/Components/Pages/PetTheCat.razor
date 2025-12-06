@@ -1,0 +1,57 @@
+﻿@page "/petthecat"
+@using CoreWCF.Client.Services
+@inject ICatInformationProvider CatInformationProvider
+
+<PageTitle>Pet The Cat</PageTitle>
+
+<h1>Pet The Cat</h1>
+
+<div class="mb-3">
+    <label for="humanTypeDropdown" class="form-label">But first let's check whether you are cool. What kind of human are you?</label>
+    <select id="humanTypeDropdown" class="form-select" @bind="_selectedHumanType">
+        @foreach (HumanType humanType in Enum.GetValues(typeof(HumanType)))
+        {
+            <option value="@humanType">@humanType</option>
+        }
+    </select>
+</div>
+
+<button class="btn btn-primary" @onclick="CheckIfCanPet">Can I Pet The Cat?</button>
+
+<div class="mt-3">
+    @if (_isLoading)
+    {
+        <p>Checking...</p>
+    }
+    else if (_canPet.HasValue)
+    {
+        @if (_canPet.Value)
+        {
+            <img src="/images/canpet.jpg" alt="You can pet the cat!" style="max-width: 500px;" />
+        }
+        else
+        {
+            <h3 style="color: red;">Yeah, absolutely not</h3>
+            <p style="color: red; font-style: italic;">@_errorMessage</p>
+        }
+    }
+</div>
+
+@code {
+    private bool? _canPet;
+    private bool _isLoading;
+    private string? _errorMessage;
+    private HumanType _selectedHumanType = HumanType.RandomPerson;
+
+    private async Task CheckIfCanPet()
+    {
+        _isLoading = true;
+        _canPet = null;
+
+        var result = await CatInformationProvider.CanPetTheCatAsync(_selectedHumanType);
+
+        _canPet = result.IsSuccess;
+        _errorMessage = result.Error;
+        _isLoading = false;
+    }
+}

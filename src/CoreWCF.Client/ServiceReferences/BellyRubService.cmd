@@ -1,0 +1,1 @@
+dotnet-svcutil https://localhost:5002/BellyRubService?wsdl --messageContract --outputDir "BellyRubService" --outputFile "BellyRubService.cs" --noTypeReuse

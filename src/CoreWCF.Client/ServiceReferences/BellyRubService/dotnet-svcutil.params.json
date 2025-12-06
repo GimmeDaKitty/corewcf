@@ -1,0 +1,13 @@
+{
+  "providerId": "Microsoft.Tools.ServiceModel.Svcutil",
+  "version": "2.1.0",
+  "options": {
+    "inputs": [
+      "https://localhost:5002/BellyRubService?wsdl"
+    ],
+    "messageContract": true,
+    "outputFile": "BellyRubService.cs",
+    "targetFramework": "net10.0",
+    "typeReuseMode": "None"
+  }
+}

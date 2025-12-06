@@ -150,4 +150,53 @@ public static class SoapResponseEnvelopeBuilder
 
         return Encoding.UTF8.GetString(stream.ToArray());
     }
+    
+    /*
+    <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+        <s:Header>
+            <CatLoverHeaderResponse>Thank you for being a cat lover!</CatLoverHeaderResponse>
+        </s:Header>
+        <s:Body>
+            <BellyRubResponse xmlns="http://tempuri.org/">
+                <Allowed>true</Allowed>
+            </BellyRubResponse>
+        </s:Body>
+    </s:Envelope>
+    */
+    public static string GetSOAPBellyRubResponse(bool allowed)
+    {
+        using var stream = new MemoryStream();
+
+        var settings = new XmlWriterSettings
+        {
+            Encoding = new UTF8Encoding(false),
+            OmitXmlDeclaration = false,
+            Indent = true
+        };
+
+        using (var writer = XmlWriter.Create(stream, settings))
+        {
+            writer.WriteStartDocument();
+            writer.WriteStartElement("soapenv", "Envelope", SOAPNS);
+            writer.WriteStartElement("soapenv", "Header", SOAPNS);
+            writer.WriteEndElement(); // Header
+
+            writer.WriteStartElement("soapenv", "Body", SOAPNS);
+            writer.WriteAttributeString("xmlns", TEMPURINGNSPREFIX, null, TEMPURINS);
+
+            // <AllowBellyRubResponse xmlns="http://tempuri.org/">
+            writer.WriteStartElement("AllowBellyRubResponse", TEMPURINS);
+        
+            // <AllowBellyRubResult>bool</AllowBellyRubResult>
+            writer.WriteStartElement("AllowBellyRubResult", TEMPURINS);
+            writer.WriteString(allowed.ToString().ToLowerInvariant());
+            writer.WriteEndElement(); // AllowBellyRubResult
+        
+            writer.WriteEndElement(); // AllowBellyRubResponse
+            writer.WriteEndElement(); // Body
+            writer.WriteEndElement(); // Envelope
+        }
+
+        return Encoding.UTF8.GetString(stream.ToArray());
+    }
 }

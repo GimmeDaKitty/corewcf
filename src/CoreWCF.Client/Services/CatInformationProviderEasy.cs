@@ -1,10 +1,15 @@
-﻿using CoreWCF.Contracts;
+﻿using System.ServiceModel;
+using System.ServiceModel.Channels;
+using System.ServiceModel.Security;
+using CoreWCF.Contracts;
 
 namespace CoreWCF.Client.Services;
 
 public sealed class CatInformationProviderEasy(
     CatFactsServiceClient catFactsServiceClient, 
-    CatInformationServiceClient catInformationServiceClient) : ICatInformationProvider
+    CatInformationServiceClient catInformationServiceClient,
+    FakeJwtTokenProvider tokenProvider,
+    BellyRubServiceClient bellyRubServiceClient) : ICatInformationProvider
 {
     public async Task<Result<string>> GetCatFactAsync()
     {
@@ -47,7 +52,7 @@ public sealed class CatInformationProviderEasy(
                 RequestTimestamp = requestDateTime
             };
 
-            // TODO - BEA - FIX? - when using REST with client type Easy, ot does not work
+            // TODO - FIX - when using REST with client type Easy, ot does not work
             // the namespaces of the generated client/requests/responses include DataContractAttribute
             // for responses. So CatType is not seen here when the server.REST because Server.REST
             // ignores the DataContractAttribute namespaces.
@@ -58,6 +63,49 @@ public sealed class CatInformationProviderEasy(
         catch (Exception ex)
         {
             return Result<CatType[]>.NOkResult($"Error while processing request: {ex.Message}");
+        }
+    }
+
+    public async Task<Result> CanPetTheCatAsync(HumanType humanType)
+    {
+        try
+        {
+            tokenProvider.SetScope(humanType);
+
+            using (new OperationContextScope(bellyRubServiceClient.InnerChannel))
+            {
+                var httpRequestProperty = new HttpRequestMessageProperty();
+                httpRequestProperty.Headers["Authorization"] = $"Bearer {tokenProvider.GenerateToken()}";
+                OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = httpRequestProperty;
+            
+                var attemptBellyRub = await bellyRubServiceClient.AllowBellyRubAsync(new AllowBellyRubRequest());
+            
+                return attemptBellyRub.AllowBellyRubResult
+                    ? Result.Ok
+                    : Result.NOk("You dont have the rights to pet the cat");
+            }
+        }
+        catch (MessageSecurityException)
+        {
+            return Result.NOk("Authentication failed (401)");
+        }
+        catch (CommunicationException ex) when (ex.Message.Contains("Access is denied") || 
+                                                ex.Message.Contains("401") ||
+                                                ex.InnerException?.Message.Contains("401") == true)
+        {
+            return Result.NOk("Authentication failed (401)");
+        }
+        catch (FaultException ex)
+        {
+            return Result.NOk($"Service error: {ex.Message}");
+        }
+        catch (CommunicationException ex)
+        {
+            return Result.NOk($"Communication error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            return Result.NOk($"Error while processing request: {ex.Message}");
         }
     }
 }

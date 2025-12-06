@@ -1,17 +1,23 @@
 using System.ServiceModel;
 using CoreWCF.Client.Components;
 using CoreWCF.Client.Services;
+using Microsoft.IdentityModel.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Infra
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+IdentityModelEventSource.ShowPII = true; // Auth debugging - don't do this in production!
+builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Debug);
+
 builder.Services
     .AddRazorComponents()
     .AddInteractiveServerComponents();
 
 // Services
+builder.Services.AddSingleton<FakeJwtTokenProvider>();
+
 var remoteServiceUrl = builder
                            .Configuration
                            .GetValue<string>("CatInformationService:Url") 
@@ -25,6 +31,10 @@ builder.Services.AddTransient<CatInformationServiceClient>(_ => new CatInformati
     CatInformationServiceClient.EndpointConfiguration.BasicHttpBinding_ICatInformationService, 
     new EndpointAddress($"{remoteServiceUrl}CatInformationService")));
     
+builder.Services.AddTransient<BellyRubServiceClient>(_ => new BellyRubServiceClient(
+        BellyRubServiceClient.EndpointConfiguration.BasicHttpBinding_IBellyRubService,
+        new EndpointAddress($"{remoteServiceUrl}BellyRubService")));
+
 builder.Services.AddScoped<ICatInformationProvider, CatInformationProviderEasy>(); 
 
 var app = builder.Build();

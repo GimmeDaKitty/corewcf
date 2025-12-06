@@ -1,18 +1,24 @@
 using CoreWCF.Server.REST.Middleware;
 using CoreWCF.Server.REST.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
+IdentityModelEventSource.ShowPII = true; // Auth debugging - do not do this in production!
+builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Debug);
 
 // Services
 builder.Services.AddHttpClient();
 builder.Services.AddTransient<ICatFactsService, CatFactsService>();
 builder.Services.AddTransient<ICatInformationService, CatInformationService>();
+builder.Services.AddTransient<IBellyRubService, BellyRubService>();
 
 // Controllers
 builder.Services.AddControllers(options =>
@@ -33,6 +39,29 @@ builder.Services.AddControllers(options =>
     options.OutputFormatters.Add(xmlOutputFormatter);
 });
 
+// Authorization for controllers
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => 
+    {
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = false,
+            RequireSignedTokens = false,
+            ValidateIssuerSigningKey = false,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                System.Text.Encoding.UTF8.GetBytes("this-is-a-super-secret-key-for-development-only-min-32-chars")
+            )
+        };
+    });
+
+// Authorization for minimal APIs
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("IsCoolHuman", policy =>
+        policy.RequireClaim("iscoolhuman", "owner", "isalergic", "catlady"));
+
 var app = builder.Build();
 
 app.MapOpenApi();
@@ -41,6 +70,10 @@ app.UseHttpsRedirection();
 // Middleware
 app.UseMiddleware<SoapRoutingMiddleware>();
 app.UseRouting();
+
+// Authentication
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapPost("/CatFactsService", async (
     [FromServices] ICatFactsService catFactsService) =>
@@ -58,6 +91,15 @@ app.MapPost("/CatInformationService/GetPhoto", async(
     var soapResponse = SoapResponseEnvelopeBuilder.GetSOAPPhotoResponse(photo.GetPhotoResult);
     return Results.Content(soapResponse, "text/xml");
 });
+
+app.MapPost("/BellyRubService", async (
+        [FromServices] IBellyRubService bellyRubService) =>
+    {
+        var bellyRubAllowedResponse = await bellyRubService.AllowBellyRubAsync(new AllowBellyRubRequest());
+        var soapResponse = SoapResponseEnvelopeBuilder.GetSOAPBellyRubResponse(bellyRubAllowedResponse.AllowBellyRubResult);
+        return Results.Content(soapResponse, "text/xml; charset=utf-8");
+    })
+    .RequireAuthorization("IsCoolHuman");
 
 app.MapControllers();
 
