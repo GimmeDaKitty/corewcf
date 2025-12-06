@@ -1,0 +1,91 @@
+﻿@page "/cattypes"
+@rendermode InteractiveServer
+@using CoreWCF.Client.Services
+@inject ICatInformationProvider CatInformationProvider
+
+<PageTitle>Cat Types</PageTitle>
+
+<h1>Cat Types</h1>
+
+<h3>Here you can get cat types. But only if you are a true cat lover.</h3>
+
+<div class="mb-3">
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="catLoverCheckbox" @bind="_isCatLover" />
+        <label class="form-check-label" for="catLoverCheckbox">
+            I am a true cat lover
+        </label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="likeChildrenCheckbox" @bind="_likeChildren" />
+        <label class="form-check-label" for="likeChildrenCheckbox">
+            Get only races that like children
+        </label>
+    </div>
+</div>
+
+<button class="btn btn-primary" @onclick="GetCatTypes">Get Cat Types</button>
+
+<div class="mt-3">
+    @if (_isLoading)
+    {
+        <p>Loading...</p>
+    }
+    else if (_faultMessage != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Fault Received!</h4>
+            <p><strong>Error Message:</strong> @_faultMessage</p>
+        </div>
+    }
+    else if (_catTypes != null)
+    {
+        <h3>Cat Races Found: @_catTypes.Length</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Race Name</th>
+                    <th>Likes Children</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cat in _catTypes)
+                {
+                    <tr>
+                        <td>@cat.RaceName</td>
+                        <td>@(cat.LikesChildren ? "Yes" : "No")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    private CatType[]? _catTypes;
+    private bool _isLoading;
+    private string? _faultMessage;
+    private bool _isCatLover;
+    private bool _likeChildren;
+
+    private async Task GetCatTypes()
+    {
+        _isLoading = true;
+        _faultMessage = null;
+        _catTypes = null;
+
+        var result  = await CatInformationProvider.GetCatTypes(_isCatLover, _likeChildren);
+
+        if (result.IsSuccess)
+        {
+            _catTypes = result.Value;
+        }
+        else
+        {
+            _faultMessage = result.Error;
+        }
+
+        _isLoading = false;
+    }
+}
+

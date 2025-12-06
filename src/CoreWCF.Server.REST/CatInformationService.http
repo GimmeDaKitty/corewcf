@@ -1,0 +1,37 @@
+﻿@CoreWCF.REST_HostAddress = http://localhost:5252
+###
+
+POST {{CoreWCF.REST_HostAddress}}/CatInformationService
+Content-Type: text/xml
+SoapAction: http://tempuri.org/ICatInformationService/GetCatPicture
+
+<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+    <Header>
+        <CatLoverHeader>I am a true cat lover</CatLoverHeader>
+        <AuthToken xmlns="http://tempuri.org/">SecretCatToken123</AuthToken>
+    </Header>
+    <Body>
+        <GetCatPicture xmlns="http://tempuri.org/">
+            <request>
+                <CatId>1</CatId>
+            </request>
+        </GetCatPicture>
+    </Body>
+</Envelope>
+
+###
+POST {{CoreWCF.REST_HostAddress}}/CatInformationService
+Content-Type: text/xml
+SoapAction: http://tempuri.org/ICatInformationService/GetCatTypes
+
+<Envelope xmlns="http://schemas.xmlsoap.org/soap/envelope/">
+    <Header>
+        <CatLoverHeader>I am a true cat lover</CatLoverHeader>
+        <AuthToken xmlns="http://tempuri.org/">SecretCatToken123</AuthToken>
+    </Header>
+    <Body>
+        <Request xmlns="http://tempuri.org/">
+            <LikesChildren>true</LikesChildren>
+        </Request>
+    </Body>
+</Envelope>
