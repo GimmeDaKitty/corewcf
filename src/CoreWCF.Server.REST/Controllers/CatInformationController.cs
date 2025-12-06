@@ -1,4 +1,5 @@
-﻿using CoreWCF.Server.REST.RestWrappers;
+﻿using CoreWCF.Server.REST.Filters;
+using CoreWCF.Server.REST.RestWrappers;
 using CoreWCF.Server.REST.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,7 @@ public class CatInformationController(
     [HttpPost("GetCatTypes")]
     [Consumes("text/xml", "application/xml")]
     [Produces("text/xml")]
+    [ServiceFilter(typeof(CatLoverHeaderAuthorizationFilter))]
     public async Task<IActionResult> GetCatTypes(
         [FromBody] GetCatTypesRequestEnvelope envelope)
     {

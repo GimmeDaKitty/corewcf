@@ -29,17 +29,6 @@ public sealed class CatInformationService(IHttpClientFactory httpClientFactory) 
     
     public GetCatTypesResponse GetCatTypes(GetCatTypesRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.CatLoverHeader))
-        {
-            var fault = new CatLoverFault
-            {
-                ErrorMessage = "I'm sorry this API is only for true cat lovers",
-                ErrorCode = "MISSING_CAT_LOVER_HEADER",
-                ErrorTimestamp = DateTime.UtcNow
-            };
-            throw new FaultException<CatLoverFault>(fault, new FaultReason(fault.ErrorMessage));
-        }
-        
         var result = request.LikesChildren
             ? _catRaces
                 .Where(c=> c.LikesChildren == request.LikesChildren)

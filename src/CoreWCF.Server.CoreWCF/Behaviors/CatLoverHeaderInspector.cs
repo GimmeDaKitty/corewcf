@@ -15,24 +15,26 @@ public class CatLoverHeaderInspector(ILogger<CatLoverHeaderInspector> logger) : 
             return null;
         }
         
-        LogHeader(request);
+        CheckForCatLoverHeader(request);
 
         return null;
     }
 
-    private void LogHeader(Message request)
+    private void CheckForCatLoverHeader(Message request)
     {
         var header = request.Headers
             .FirstOrDefault(h => h.Name == "CatLoverHeader");
         
-        if (header != null)
+        var headerValue = request.Headers.GetHeader<string>(header?.Name, header?.Namespace);
+        
+        if (headerValue != null)
         {
-            var headerValue = request.Headers.GetHeader<string>(header.Name, header.Namespace);
             logger.LogInformation("CatLoverHeader found in GetCatTypes request: {HeaderValue}", headerValue);
         }
         else
         {
-            logger.LogWarning("No CatLoverHeader found in GetCatTypes request");
+            logger.LogError("Authorization inspector: I'm sorry this API is only for true cat lovers");
+            throw new CommunicationException("401 - I'm sorry this API is only for true cat lovers");
         }
     }
 

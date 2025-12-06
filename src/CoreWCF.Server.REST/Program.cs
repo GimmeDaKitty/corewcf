@@ -1,3 +1,4 @@
+using CoreWCF.Server.REST.Filters;
 using CoreWCF.Server.REST.Middleware;
 using CoreWCF.Server.REST.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,8 +22,11 @@ builder.Services.AddTransient<ICatInformationService, CatInformationService>();
 builder.Services.AddTransient<IBellyRubService, BellyRubService>();
 
 // Controllers
+builder.Services.AddScoped<CatLoverHeaderAuthorizationFilter>();
 builder.Services.AddControllers(options =>
 {
+    options.Filters.Add<CatLoverHeaderAuthorizationFilter>();
+    
     options.InputFormatters.RemoveType<XmlSerializerInputFormatter>();
     options.OutputFormatters.RemoveType<XmlSerializerOutputFormatter>();
     
@@ -69,6 +73,8 @@ app.UseHttpsRedirection();
 
 // Middleware
 app.UseMiddleware<SoapRoutingMiddleware>();
+app.UseMiddleware<RequestIdLoggingMiddleware>();
+
 app.UseRouting();
 
 // Authentication
