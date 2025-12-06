@@ -35,10 +35,10 @@ public static class SoapResponseEnvelopeBuilder
             // <CatFactResponse xmlns="http://tempuri.org/">
             writer.WriteStartElement("CatFactResponse", TEMPURINS);
 
-            // <CatFact>factstring</CatFact>
-            writer.WriteStartElement("CatFact", TEMPURINS);
+            // <Fact>factstring</Fact>
+            writer.WriteStartElement("Fact", TEMPURINS);
             writer.WriteString(catFact);
-            writer.WriteEndElement(); // CatFact
+            writer.WriteEndElement(); // Fact
 
             writer.WriteEndElement(); // CatFactResponse
             writer.WriteEndElement(); // Body

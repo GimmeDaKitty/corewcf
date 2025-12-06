@@ -49,15 +49,7 @@ app.UseServiceModel(serviceBuilder =>
     
     serviceBuilder.AddServiceEndpoint<CatInformationService, ICatInformationService>(
         Bindings.BasicHttpBindingWithEncoding,
-        "/CatInformationService", ep =>
-        {
-            var endpointBehavior = app.Services.GetRequiredService<CatInformationServiceEndpointBehaviors>();
-            ep.EndpointBehaviors.Add(endpointBehavior);
-
-            var operationBehavior = app.Services.GetRequiredService<CatInformationServiceOperationBehaviors>();
-            var getCatTypesOperation = ep.Contract.Operations.First(o => o.Name == nameof(ICatInformationService.GetCatTypes));
-            getCatTypesOperation.OperationBehaviors.Add(operationBehavior);
-        });
+        "/CatInformationService");
     
     // Enables metadata endpoint
     //  https://localhost:5002/CatFactsService?wsdl

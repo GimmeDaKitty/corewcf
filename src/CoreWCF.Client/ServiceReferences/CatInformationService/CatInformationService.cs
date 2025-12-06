@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CoreWCF.Client
+namespace CoreWCF.Contracts
 {
     using System.Runtime.Serialization;
     
@@ -112,7 +112,7 @@ public interface ICatInformationService
     System.Threading.Tasks.Task<GetPhotoResponse> GetPhotoAsync(GetPhotoRequest request);
     
     [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICatInformationService/GetCatTypes", ReplyAction="http://tempuri.org/ICatInformationService/GetCatTypesResponse")]
-    [System.ServiceModel.FaultContractAttribute(typeof(CoreWCF.Client.CatLoverFault), Action="http://tempuri.org/ICatInformationService/GetCatTypesCatLoverFaultFault", Name="CatLoverFault", Namespace="http://schemas.datacontract.org/2004/07/CoreWCF.Contracts")]
+    [System.ServiceModel.FaultContractAttribute(typeof(CoreWCF.Contracts.CatLoverFault), Action="http://tempuri.org/ICatInformationService/GetCatTypesCatLoverFaultFault", Name="CatLoverFault", Namespace="http://schemas.datacontract.org/2004/07/CoreWCF.Contracts")]
     System.Threading.Tasks.Task<GetCatTypesResponse> GetCatTypesAsync(GetCatTypesRequest request);
 }
 
@@ -190,13 +190,13 @@ public partial class GetCatTypesResponse
     public int TotalCount;
     
     [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
-    public CoreWCF.Client.CatType[] CatTypes;
+    public CoreWCF.Contracts.CatType[] CatTypes;
     
     public GetCatTypesResponse()
     {
     }
     
-    public GetCatTypesResponse(string ResponseId, int TotalCount, CoreWCF.Client.CatType[] CatTypes)
+    public GetCatTypesResponse(string ResponseId, int TotalCount, CoreWCF.Contracts.CatType[] CatTypes)
     {
         this.ResponseId = ResponseId;
         this.TotalCount = TotalCount;

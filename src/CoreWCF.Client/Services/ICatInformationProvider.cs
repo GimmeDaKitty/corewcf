@@ -1,3 +1,5 @@
+using CoreWCF.Contracts;
+
 namespace CoreWCF.Client.Services;
 
 internal interface ICatInformationProvider
