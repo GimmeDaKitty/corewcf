@@ -1,4 +1,5 @@
 using System.ServiceModel;
+using CoreWCF.Client.Behaviors;
 using CoreWCF.Client.Components;
 using CoreWCF.Client.Services;
 using Microsoft.IdentityModel.Logging;
@@ -31,9 +32,18 @@ builder.Services.AddTransient<CatInformationServiceClient>(_ => new CatInformati
     CatInformationServiceClient.EndpointConfiguration.BasicHttpBinding_ICatInformationService, 
     new EndpointAddress($"{remoteServiceUrl}CatInformationService")));
     
-builder.Services.AddTransient<BellyRubServiceClient>(_ => new BellyRubServiceClient(
+builder.Services.AddTransient<BellyRubServiceClient>(sp =>
+{
+    var client = new BellyRubServiceClient(
         BellyRubServiceClient.EndpointConfiguration.BasicHttpBinding_IBellyRubService,
-        new EndpointAddress($"{remoteServiceUrl}BellyRubService")));
+        new EndpointAddress($"{remoteServiceUrl}BellyRubService"));
+        
+    // AUTH from DI - applicable to this service only.
+    var tokenProvider = sp.GetRequiredService<FakeJwtTokenProvider>();
+    client.Endpoint.EndpointBehaviors.Add(new AuthorizationHeaderBehavior(tokenProvider));
+
+    return client;
+});
 
 builder.Services.AddScoped<ICatInformationProvider, CatInformationProviderEasy>(); 
 

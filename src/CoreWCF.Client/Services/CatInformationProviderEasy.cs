@@ -71,19 +71,13 @@ public sealed class CatInformationProviderEasy(
         try
         {
             tokenProvider.SetScope(humanType);
-
-            using (new OperationContextScope(bellyRubServiceClient.InnerChannel))
-            {
-                var httpRequestProperty = new HttpRequestMessageProperty();
-                httpRequestProperty.Headers["Authorization"] = $"Bearer {tokenProvider.GenerateToken()}";
-                OperationContext.Current.OutgoingMessageProperties[HttpRequestMessageProperty.Name] = httpRequestProperty;
             
-                var attemptBellyRub = await bellyRubServiceClient.AllowBellyRubAsync(new AllowBellyRubRequest());
+            // Client already comes configured with AUTH from DI
+            var attemptBellyRub = await bellyRubServiceClient.AllowBellyRubAsync(new AllowBellyRubRequest());
             
-                return attemptBellyRub.AllowBellyRubResult
-                    ? Result.Ok
-                    : Result.NOk("You dont have the rights to pet the cat");
-            }
+            return attemptBellyRub.AllowBellyRubResult
+            ? Result.Ok
+            : Result.NOk("You dont have the rights to pet the cat");
         }
         catch (MessageSecurityException)
         {
